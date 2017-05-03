@@ -109,7 +109,7 @@ public class RecipesLoaderFromDb extends AsyncTaskLoader<Recipe[]> {
     }
 
     @Override
-    public void deliverResult(Recipe[] data) {
+    public void deliverResult(@NonNull Recipe[] data) {
         recipes = data;
         super.deliverResult(data);
     }

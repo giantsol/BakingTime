@@ -10,7 +10,7 @@ import com.lee.hansol.bakingtime.models.Recipe;
 
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeViewHolder> {
     private Context context;
-    @NonNull private Recipe[] recipes;
+    @NonNull private Recipe[] recipes = new Recipe[0];
 
     public RecipesAdapter(Context context) {
         this.context = context;
@@ -23,7 +23,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
 
     @Override
     public int getItemCount() {
-        return recipes.length;
+        return 0;
     }
 
     @Override
