@@ -1,5 +1,7 @@
 package com.lee.hansol.bakingtime.utils;
 
+import android.support.annotation.Nullable;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -9,6 +11,7 @@ import java.util.Scanner;
 public class NetworkUtils {
 
     //Copied and pasted from one of the Udacity Android Developer lectures.
+    @Nullable
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
