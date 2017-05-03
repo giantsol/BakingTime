@@ -19,26 +19,18 @@ import java.util.Scanner;
 
 public class NetworkUtils {
 
-    //Copied and pasted from one of the Udacity Android Developer lectures.
-    @Nullable
-    public static String getResponseFromHttpUrl(URL url) throws IOException {
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+    public static JSONArray readJsonFromUrl(String url) throws IOException, JSONException {
+        InputStream is = new URL(url).openStream();
         try {
-            InputStream in = urlConnection.getInputStream();
-
-            Scanner scanner = new Scanner(in);
-            scanner.useDelimiter("\\A");
-
-            boolean hasInput = scanner.hasNext();
-            if (hasInput) {
-                return scanner.next();
-            } else {
-                return null;
-            }
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-16")));
+            String jsonText = readAll(rd);
+            JSONArray json = new JSONArray(jsonText);
+            return json;
         } finally {
-            urlConnection.disconnect();
+            is.close();
         }
     }
+
     private static String readAll(Reader rd) throws IOException {
         StringBuilder sb = new StringBuilder();
         int cp;
@@ -48,17 +40,4 @@ public class NetworkUtils {
         return sb.toString();
     }
 
-    public static JSONArray readJsonFromUrl(String url) throws IOException, JSONException {
-        InputStream is = new URL(url).openStream();
-        try {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-16")));
-            String jsonText = readAll(rd);
-            Log.d("hello", jsonText);
-            JSONArray json = new JSONArray(jsonText);
-            Log.d("hello", json.toString());
-            return json;
-        } finally {
-            is.close();
-        }
-    }
 }
