@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">BakingTime</string>
+
+    <string name="exception_unknown_id_placeholder">Unknown id: %d</string>
 </resources>

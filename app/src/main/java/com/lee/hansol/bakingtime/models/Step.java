@@ -5,16 +5,16 @@ public class Step {
     public int stepOrder;
     public String shortDescription;
     public String description;
-    public String videoUrl;
-    public String thumbnailUrl;
+    public String videoUrlString;
+    public String thumbnailUrlString;
 
     public Step(int recipeId, int stepOrder, String shortDescription,
-                String description, String videoUrl, String thumbnailUrl) {
+                String description, String videoUrlString, String thumbnailUrlString) {
         this.recipeId = recipeId;
         this.stepOrder = stepOrder;
         this.shortDescription = shortDescription;
         this.description = description;
-        this.videoUrl = videoUrl;
-        this.thumbnailUrl = thumbnailUrl;
+        this.videoUrlString = videoUrlString;
+        this.thumbnailUrlString = thumbnailUrlString;
     }
 }
