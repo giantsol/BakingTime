@@ -32,7 +32,7 @@ public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
 
     @Override
     protected void onStartLoading() {
-        log(getContext().getString(R.string.log_on_start_loading_from_internet_loader));
+        log(R.string.log_on_start_loading_from_internet_loader);
         if (recipes != null) deliverResult(recipes);
         else forceLoad();
     }
@@ -40,7 +40,7 @@ public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
     @Override
     @NonNull
     public Recipe[] loadInBackground() {
-        log(getContext().getString(R.string.log_load_in_background_from_internet_loader));
+        log(R.string.log_load_in_background_from_internet_loader);
         String urlString = getContext().getString(R.string.url_baking_recipe);
         try {
             Recipe[] recipes = getRecipesFromUrl(urlString);
@@ -141,7 +141,7 @@ public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
 
     @Override
     public void deliverResult(@NonNull Recipe[] data) {
-        log(getContext().getString(R.string.log_deliver_result_from_internet_loader));
+        log(R.string.log_deliver_result_from_internet_loader);
         recipes = data;
         super.deliverResult(data);
     }
