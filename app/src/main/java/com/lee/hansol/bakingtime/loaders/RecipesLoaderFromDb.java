@@ -4,8 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v4.content.AsyncTaskLoader;
-import android.util.Log;
 
+import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.db.BakingProvider;
 import com.lee.hansol.bakingtime.db.IngredientColumns;
 import com.lee.hansol.bakingtime.db.RecipeColumns;
@@ -15,6 +15,8 @@ import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.models.Step;
 
 import java.util.ArrayList;
+
+import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 public class RecipesLoaderFromDb extends AsyncTaskLoader<Recipe[]> {
     private Recipe[] recipes;
@@ -28,7 +30,7 @@ public class RecipesLoaderFromDb extends AsyncTaskLoader<Recipe[]> {
 
     @Override
     protected void onStartLoading() {
-        Log.d("hello", "onStartLoading from Db thing");
+        log(getContext().getString(R.string.log_on_start_loading_from_db_loader));
         if (recipes != null) deliverResult(recipes);
         else forceLoad();
     }
@@ -36,7 +38,7 @@ public class RecipesLoaderFromDb extends AsyncTaskLoader<Recipe[]> {
     @Override
     @NonNull
     public Recipe[] loadInBackground() {
-        Log.d("hello", "Loading recipes from database");
+        log(getContext().getString(R.string.log_load_in_background_from_db_loader));
         Cursor cursor = getRecipesTableCursor();
         if (cursor != null) {
             return getRecipesAndClose(cursor);
@@ -163,7 +165,7 @@ public class RecipesLoaderFromDb extends AsyncTaskLoader<Recipe[]> {
 
     @Override
     public void deliverResult(@NonNull Recipe[] data) {
-        Log.d("hello", "deliverResult from Db thing");
+        log(getContext().getString(R.string.log_deliver_result_from_db_loader));
         recipes = data;
         super.deliverResult(data);
     }

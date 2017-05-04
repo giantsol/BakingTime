@@ -1,6 +1,5 @@
 package com.lee.hansol.bakingtime;
 
-import android.content.ContentValues;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,19 +11,11 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.lee.hansol.bakingtime.adapters.RecipesAdapter;
-import com.lee.hansol.bakingtime.db.BakingProvider;
-import com.lee.hansol.bakingtime.db.IngredientColumns;
-import com.lee.hansol.bakingtime.db.RecipeColumns;
-import com.lee.hansol.bakingtime.db.StepColumns;
 import com.lee.hansol.bakingtime.loaders.RecipesLoaderFromDb;
 import com.lee.hansol.bakingtime.loaders.RecipesLoaderFromInternet;
-import com.lee.hansol.bakingtime.models.Ingredient;
 import com.lee.hansol.bakingtime.models.Recipe;
-import com.lee.hansol.bakingtime.models.Step;
+import com.lee.hansol.bakingtime.utils.LogUtils;
 import com.lee.hansol.bakingtime.utils.UserStateUtils;
-
-import java.util.ArrayList;
-import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         butterKnifeUnbinder = ButterKnife.bind(this);
+        LogUtils.context = this;
 
         initialize();
     }
@@ -91,7 +83,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        LogUtils.context = null;
         butterKnifeUnbinder.unbind();
+        super.onDestroy();
     }
 }

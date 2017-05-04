@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.content.AsyncTaskLoader;
-import android.util.Log;
 
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.db.BakingProvider;
