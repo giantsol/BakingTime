@@ -18,17 +18,16 @@ import com.lee.hansol.bakingtime.utils.JsonUtils;
 import com.lee.hansol.bakingtime.utils.NetworkUtils;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
 
 import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
     private Recipe[] recipes;
     private final Recipe[] emptyRecipes = new Recipe[0];
-    private int currentRecipeId;
 
     public RecipesLoaderFromInternet(Context context) { super(context); }
 
@@ -46,7 +45,10 @@ public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
         String urlString = getContext().getString(R.string.url_baking_recipe);
         try {
             Recipe[] recipes = getRecipesFromUrl(urlString);
-            saveRecipesToDb(recipes);
+            int insertedRowNum = saveRecipesToDb(recipes);
+            log(String.format(Locale.getDefault(),
+                    getContext().getString(R.string.log_inserted_row_count_placeholder),
+                    insertedRowNum));
             return recipes;
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,80 +60,38 @@ public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
     private Recipe[] getRecipesFromUrl(String url) throws Exception {
         JSONArray recipesJsonArray = NetworkUtils.getJSONArrayFromUrl(getContext(), url);
         if (recipesJsonArray != null) {
-            return getRecipeObjectsFromJsonArray(recipesJsonArray);
+            return JsonUtils.getRecipeObjectsFromJsonArray(recipesJsonArray);
         } else {
             return emptyRecipes;
         }
     }
 
-    private Recipe[] getRecipeObjectsFromJsonArray(@NonNull JSONArray recipesJsonArray) throws Exception {
-        ArrayList<Recipe> recipes = new ArrayList<>();
-        for (int i = 0; i < recipesJsonArray.length(); i++) {
-            JSONObject recipeJson = recipesJsonArray.getJSONObject(i);
-            Recipe recipe = getRecipeObjectFromJsonObject(recipeJson);
-            recipes.add(recipe);
-        }
-        return recipes.toArray(emptyRecipes);
+    private int saveRecipesToDb(Recipe[] updatedRecipes) {
+        Ingredient[] updatedIngredients = getAllIngredientsFrom(updatedRecipes);
+        Step[] updatedSteps = getAllStepsFrom(updatedRecipes);
+        return saveAndReturnInsertedRowNum(updatedRecipes, updatedIngredients, updatedSteps);
     }
 
-    private Recipe getRecipeObjectFromJsonObject(JSONObject recipeJson) throws Exception {
-        currentRecipeId = recipeJson.getInt("id");
-        String recipeName = recipeJson.getString("name");
-        Ingredient[] ingredients = getIngredientObjectsFromJsonArray( recipeJson.getJSONArray("ingredients") );
-        Step[] steps = getStepObjectsFromJsonArray( recipeJson.getJSONArray("steps") );
-        int servings = recipeJson.getInt("servings");
-        String imageUrlString = recipeJson.getString("image");
-        return new Recipe(currentRecipeId, recipeName, ingredients, steps, servings, imageUrlString);
-    }
-
-    private Ingredient[] getIngredientObjectsFromJsonArray(JSONArray ingredientsJsonArray) throws Exception{
-        ArrayList<Ingredient> ingredients = new ArrayList<>(ingredientsJsonArray.length());
-        for (int j = 0; j < ingredientsJsonArray.length(); j++) {
-            JSONObject ingredientJson = ingredientsJsonArray.getJSONObject(j);
-            Ingredient ingredient = getIngredientObjectFromJsonObject(ingredientJson);
-            ingredients.add(ingredient);
+    private Ingredient[] getAllIngredientsFrom(Recipe[] recipes) {
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        for (Recipe recipe : recipes) {
+            Collections.addAll(ingredients, recipe.ingredients);
         }
         return ingredients.toArray(new Ingredient[0]);
     }
 
-    private Ingredient getIngredientObjectFromJsonObject(JSONObject ingredientJson) throws Exception{
-        int quantity = ingredientJson.getInt("quantity");
-        String measureUnit = ingredientJson.getString("measure");
-        String ingredientName = ingredientJson.getString("ingredient");
-        return new Ingredient(currentRecipeId, ingredientName, quantity, measureUnit);
-    }
-
-    private Step[] getStepObjectsFromJsonArray(JSONArray stepsJsonArray) throws Exception{
-        ArrayList<Step> steps = new ArrayList<>(stepsJsonArray.length());
-        for (int j = 0; j < stepsJsonArray.length(); j++) {
-            JSONObject stepJson = stepsJsonArray.getJSONObject(j);
-            Step step = getStepObjectFromJsonObject(stepJson);
-            steps.add(step);
+    private Step[] getAllStepsFrom(Recipe[] recipes) {
+        ArrayList<Step> steps = new ArrayList<>();
+        for (Recipe recipe : recipes) {
+            Collections.addAll(steps, recipe.steps);
         }
         return steps.toArray(new Step[0]);
     }
 
-    private Step getStepObjectFromJsonObject(JSONObject stepJson) throws Exception{
-        int stepOrder = stepJson.getInt("id");
-        String shortDescription = stepJson.getString("shortDescription");
-        String description = stepJson.getString("description");
-        String videoUrlString = stepJson.getString("videoURL");
-        String thumbnailUrlString = stepJson.getString("thumbnailURL");
-        return new Step(currentRecipeId, stepOrder, shortDescription, description,
-                videoUrlString, thumbnailUrlString);
-    }
-
-    private int saveRecipesToDb(Recipe[] updatedRecipes) {
-        ArrayList<Ingredient> ingredients = new ArrayList<>();
-        ArrayList<Step> steps = new ArrayList<>();
-        for (Recipe recipe : updatedRecipes) {
-            Collections.addAll(ingredients, recipe.ingredients);
-            Collections.addAll(steps, recipe.steps);
-        }
-
-        ContentValues[] recipeValues = getRecipeContentValues(updatedRecipes);
-        ContentValues[] ingredientValues = getIngredientContentValues(ingredients.toArray(new Ingredient[0]));
-        ContentValues[] stepValues = getStepContentValues(steps.toArray(new Step[0]));
+    private int saveAndReturnInsertedRowNum(Recipe[] recipes, Ingredient[] ingredients, Step[] steps) {
+        ContentValues[] recipeValues = getRecipeContentValues(recipes);
+        ContentValues[] ingredientValues = getIngredientContentValues(ingredients);
+        ContentValues[] stepValues = getStepContentValues(steps);
         int insertedCount = 0;
         insertedCount += getContext().getContentResolver().bulkInsert(BakingProvider.Recipes.CONTENT_URI, recipeValues);
         insertedCount += getContext().getContentResolver().bulkInsert(BakingProvider.Ingredients.CONTENT_URI, ingredientValues);
@@ -179,9 +139,10 @@ public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
         }
         return values.toArray(new ContentValues[0]);
     }
+
     @Override
     public void deliverResult(@NonNull Recipe[] data) {
-        Log.d("hello", "deliverresult from internet thing");
+        log(getContext().getString(R.string.log_deliver_result_from_internet_loader));
         recipes = data;
         super.deliverResult(data);
     }

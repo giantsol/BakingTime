@@ -5,6 +5,8 @@
 
     <string name="log_on_start_loading_from_internet_loader">onstartloading from internet loader</string>
     <string name="log_load_in_background_from_internet_loader">loadinbackground from internet loader</string>
+    <string name="log_deliver_result_from_internet_loader">deliverresult from internet loader</string>
+    <string name="log_inserted_row_count_placeholder">Num of rows inserted: %d</string>
 
     <string name="url_baking_recipe">https://d17h27t6h515a5.cloudfront.net/topher/2017/May/5907926b_baking/baking.json</string>
 
