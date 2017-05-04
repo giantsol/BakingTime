@@ -17,10 +17,14 @@ import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.utils.LogUtils;
 import com.lee.hansol.bakingtime.utils.UserStateUtils;
 
+import java.util.Locale;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+
+import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Recipe[]> {
     private Unbinder butterKnifeUnbinder;
@@ -67,7 +71,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Recipe[]> loader, @NonNull Recipe[] recipes) {
-        Log.d("hello", "" + recipes.length + " number of recipes loaded!");
+        log(String.format(Locale.getDefault(),
+                getString(R.string.log_number_of_recipes_loaded_placeholder),
+                recipes.length));
         recipesAdapter.setRecipes(recipes);
     }
 
