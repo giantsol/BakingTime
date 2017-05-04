@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
+import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.db.BakingProvider;
 import com.lee.hansol.bakingtime.db.IngredientColumns;
 import com.lee.hansol.bakingtime.db.RecipeColumns;
@@ -13,15 +14,16 @@ import com.lee.hansol.bakingtime.db.StepColumns;
 import com.lee.hansol.bakingtime.models.Ingredient;
 import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.models.Step;
+import com.lee.hansol.bakingtime.utils.JsonUtils;
 import com.lee.hansol.bakingtime.utils.NetworkUtils;
-import com.lee.hansol.bakingtime.utils.UserStateUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.net.URLStreamHandler;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
     private Recipe[] recipes;
@@ -32,7 +34,7 @@ public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
 
     @Override
     protected void onStartLoading() {
-        Log.d("hello", "onstartloading from internet thing");
+        log(getContext().getString(R.string.log_on_start_loading_from_internet_loader));
         if (recipes != null) deliverResult(recipes);
         else forceLoad();
     }
@@ -40,20 +42,21 @@ public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
     @Override
     @NonNull
     public Recipe[] loadInBackground() {
-        Log.d("hello", "Loading recipes online");
-        String urlString = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/5907926b_baking/baking.json";
+        log(getContext().getString(R.string.log_load_in_background_from_internet_loader));
+        String urlString = getContext().getString(R.string.url_baking_recipe);
         try {
             Recipe[] recipes = getRecipesFromUrl(urlString);
             saveRecipesToDb(recipes);
             return recipes;
         } catch (Exception e) {
+            e.printStackTrace();
             return emptyRecipes;
         }
     }
 
     @NonNull
     private Recipe[] getRecipesFromUrl(String url) throws Exception {
-        JSONArray recipesJsonArray = NetworkUtils.readJsonFromUrl(url);
+        JSONArray recipesJsonArray = NetworkUtils.getJSONArrayFromUrl(getContext(), url);
         if (recipesJsonArray != null) {
             return getRecipeObjectsFromJsonArray(recipesJsonArray);
         } else {

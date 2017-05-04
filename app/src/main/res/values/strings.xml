@@ -2,4 +2,11 @@
     <string name="app_name">BakingTime</string>
 
     <string name="exception_unknown_id_placeholder">Unknown id: %d</string>
+
+    <string name="log_on_start_loading_from_internet_loader">onstartloading from internet loader</string>
+    <string name="log_load_in_background_from_internet_loader">loadinbackground from internet loader</string>
+
+    <string name="url_baking_recipe">https://d17h27t6h515a5.cloudfront.net/topher/2017/May/5907926b_baking/baking.json</string>
+
+    <string name="encoding_backing_recipe_webpage" translatable="false">UTF-16</string>
 </resources>
