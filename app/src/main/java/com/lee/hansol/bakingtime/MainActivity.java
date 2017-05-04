@@ -6,9 +6,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import com.lee.hansol.bakingtime.adapters.RecipesAdapter;
 import com.lee.hansol.bakingtime.loaders.RecipesLoaderFromDb;
@@ -21,7 +21,6 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.Unbinder;
 
 import static com.lee.hansol.bakingtime.utils.LogUtils.log;
@@ -50,7 +49,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private void initializeMainRecyclerView() {
         mainRecyclerView.setHasFixedSize(true);
-        mainRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        int colNum = getResources().getInteger(R.integer.main_grid_column_number);
+        GridLayoutManager grid = new GridLayoutManager(this, colNum, LinearLayoutManager.VERTICAL, false);
+        mainRecyclerView.setLayoutManager(grid);
         recipesAdapter = new RecipesAdapter(this);
         mainRecyclerView.setAdapter(recipesAdapter);
     }
@@ -74,17 +75,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         log(String.format(Locale.getDefault(),
                 getString(R.string.log_number_of_recipes_loaded_placeholder),
                 recipes.length));
-        recipesAdapter.setRecipes(recipes);
+        recipesAdapter.setRecipesAndRefresh(recipes);
     }
 
     @Override
     public void onLoaderReset(Loader<Recipe[]> loader) {
         loader.cancelLoad();
-    }
-
-    @OnClick(R.id.testButton)
-    public void testButton() {
-        loadRecipes();
     }
 
     @Override
