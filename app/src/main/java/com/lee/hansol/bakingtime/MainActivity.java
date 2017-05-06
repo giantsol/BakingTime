@@ -33,8 +33,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @BindView(R.id.activity_main_recyclerview) RecyclerView mainRecyclerView;
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public static final String INTENT_EXTRA_RECIPE_OBJECT = "recipe_object";
+
+    @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -86,7 +87,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onRecipeItemClick(Recipe recipe) {
-        startActivity(new Intent(this, RecipeDetailActivity.class));
+        Intent intent = new Intent(this, RecipeDetailActivity.class);
+        intent.putExtra(INTENT_EXTRA_RECIPE_OBJECT, recipe);
+        startActivity(intent);
     }
 
     @Override

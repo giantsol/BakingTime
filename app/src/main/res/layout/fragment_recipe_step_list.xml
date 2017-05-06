@@ -8,6 +8,10 @@
         layout="@layout/ingredients"
         android:layout_width="match_parent"
         android:layout_height="200dp"/>
+    <TextView
+        android:id="@+id/temp"
+        android:layout_width="match_parent"
+        android:layout_height="100dp" />
     <android.support.v7.widget.RecyclerView
         android:id="@+id/fragment_recipe_step_list_recyclerview"
         android:layout_width="match_parent"

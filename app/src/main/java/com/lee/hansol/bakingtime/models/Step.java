@@ -1,6 +1,9 @@
 package com.lee.hansol.bakingtime.models;
 
-public class Step {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Step implements Parcelable {
     public int recipeId;
     public int stepOrder;
     public String shortDescription;
@@ -17,4 +20,40 @@ public class Step {
         this.videoUrlString = videoUrlString;
         this.thumbnailUrlString = thumbnailUrlString;
     }
+
+    private Step(Parcel in) {
+        recipeId = in.readInt();
+        stepOrder = in.readInt();
+        shortDescription = in.readString();
+        description = in.readString();
+        videoUrlString = in.readString();
+        thumbnailUrlString = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(recipeId);
+        dest.writeInt(stepOrder);
+        dest.writeString(shortDescription);
+        dest.writeString(description);
+        dest.writeString(videoUrlString);
+        dest.writeString(thumbnailUrlString);
+    }
+
+    public static final Parcelable.Creator<Step> CREATOR = new Parcelable.Creator<Step>() {
+        @Override
+        public Step createFromParcel(Parcel parcel) {
+            return new Step(parcel);
+        }
+
+        @Override
+        public Step[] newArray(int i) {
+            return new Step[i];
+        }
+    };
 }
