@@ -20,6 +20,8 @@ public class RecipeStepListFragment extends Fragment {
     private Unbinder unbinder;
     private Recipe recipe;
 
+    private final String BUNDLE_KEY_SAVED_RECIPE_OBJECT = "saved_recipe_object";
+
     public static RecipeStepListFragment getInstance(Recipe recipe) {
         RecipeStepListFragment fragment = new RecipeStepListFragment();
         fragment.recipe = recipe;
@@ -32,6 +34,10 @@ public class RecipeStepListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            recipe = savedInstanceState.getParcelable(BUNDLE_KEY_SAVED_RECIPE_OBJECT);
+        }
+
         View view = inflater.inflate(R.layout.fragment_recipe_step_list, container, false);
         unbinder = ButterKnife.bind(this, view);
 
@@ -42,6 +48,11 @@ public class RecipeStepListFragment extends Fragment {
 
     private void initializeIngredientsRecyclerView() {
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(BUNDLE_KEY_SAVED_RECIPE_OBJECT, recipe);
     }
 
     @Override
