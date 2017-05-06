@@ -23,6 +23,9 @@
             android:name=".db.generated.BakingProvider"
             android:authorities="com.lee.hansol.bakingtime.BakingProvider"
             android:exported="false"/>
+
+        <activity android:name=".RecipeDetailActivity"
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>

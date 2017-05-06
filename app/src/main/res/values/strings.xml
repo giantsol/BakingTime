@@ -17,4 +17,5 @@
     <string name="encoding_backing_recipe_webpage" translatable="false">UTF-16</string>
 
     <string name="text_servings_placeholder">Servings: %d</string>
+    <string name="text_ingredients">Ingredients</string>
 </resources>

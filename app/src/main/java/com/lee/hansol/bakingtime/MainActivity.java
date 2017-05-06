@@ -1,5 +1,6 @@
 package com.lee.hansol.bakingtime;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,8 +26,8 @@ import butterknife.Unbinder;
 
 import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Recipe[]> {
-    private Unbinder butterKnifeUnbinder;
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Recipe[]>,
+        RecipesAdapter.OnRecipeItemClickListener {
     private RecipesAdapter recipesAdapter;
     private final int LOADER_ID_LOAD_RECIPES = 111;
 
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        butterKnifeUnbinder = ButterKnife.bind(this);
+        ButterKnife.bind(this);
         LogUtils.context = this;
 
         initialize();
@@ -84,9 +85,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
+    public void onRecipeItemClick(Recipe recipe) {
+        startActivity(new Intent(this, RecipeDetailActivity.class));
+    }
+
+    @Override
     protected void onDestroy() {
         LogUtils.context = null;
-        butterKnifeUnbinder.unbind();
         super.onDestroy();
     }
 }

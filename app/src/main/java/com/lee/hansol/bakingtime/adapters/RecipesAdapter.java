@@ -3,7 +3,6 @@ package com.lee.hansol.bakingtime.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,13 +20,19 @@ import butterknife.ButterKnife;
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeViewHolder> {
     private Context context;
     @NonNull private Recipe[] recipes = new Recipe[0];
+    private final OnRecipeItemClickListener recipeItemClickListener;
 
-    public RecipesAdapter(Context context) {
-        this.context = context;
+    public interface OnRecipeItemClickListener {
+        void onRecipeItemClick(Recipe recipe);
+    }
+
+    public RecipesAdapter(OnRecipeItemClickListener recipeItemClickListener) {
+        this.recipeItemClickListener = recipeItemClickListener;
     }
 
     @Override
     public RecipeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        context = parent.getContext();
         View holderView = LayoutInflater.from(context).inflate(R.layout.recipe_list_item, parent, false);
         return new RecipeViewHolder(holderView);
     }
@@ -52,7 +57,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
         notifyDataSetChanged();
     }
 
-    class RecipeViewHolder extends RecyclerView.ViewHolder {
+    class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @BindView(R.id.recipe_list_item_name) TextView name;
         @BindView(R.id.recipe_list_item_servings) TextView servings;
         @BindView(R.id.recipe_list_item_image) ImageView image;
@@ -60,6 +65,12 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
         RecipeViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            recipeItemClickListener.onRecipeItemClick(recipes[getAdapterPosition()]);
         }
     }
 }

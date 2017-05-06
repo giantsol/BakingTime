@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="200dp"
     android:layout_margin="@dimen/spacing_small"
-    android:background="@android:color/white"
+    android:background="?android:attr/selectableItemBackground"
     android:elevation="@dimen/elevation_normal">
     <ImageView
         android:id="@+id/recipe_list_item_image"
