@@ -87,6 +87,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onRecipeItemClick(Recipe recipe) {
+        startRecipeDetailActivityWith(recipe);
+    }
+
+    private void startRecipeDetailActivityWith(Recipe recipe) {
         Intent intent = new Intent(this, RecipeDetailActivity.class);
         intent.putExtra(INTENT_EXTRA_RECIPE_OBJECT, recipe);
         startActivity(intent);

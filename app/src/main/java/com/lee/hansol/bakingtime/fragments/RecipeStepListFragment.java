@@ -31,19 +31,21 @@ public class RecipeStepListFragment extends Fragment {
     @BindView(R.id.ingredients_recyclerview) RecyclerView ingredientsView;
     @BindView(R.id.temp) TextView temp;
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            recipe = savedInstanceState.getParcelable(BUNDLE_KEY_SAVED_RECIPE_OBJECT);
-        }
-
+        restoreSavedStateIfExists(savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_recipe_step_list, container, false);
         unbinder = ButterKnife.bind(this, view);
 
         initializeIngredientsRecyclerView();
         temp.setText(recipe.name);
         return view;
+    }
+
+    private void restoreSavedStateIfExists(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            recipe = savedInstanceState.getParcelable(BUNDLE_KEY_SAVED_RECIPE_OBJECT);
+        }
     }
 
     private void initializeIngredientsRecyclerView() {
