@@ -9,4 +9,6 @@
     <dimen name="textsize_bigger">18sp</dimen>
     <dimen name="textsize_big">24sp</dimen>
     <dimen name="textsize_very_big">30sp</dimen>
+
+    <dimen name="shadow_height">10dp</dimen>
 </resources>
