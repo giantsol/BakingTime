@@ -17,7 +17,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeViewHolder> {
+public class RecipesRecyclerViewAdapter extends RecyclerView.Adapter<RecipesRecyclerViewAdapter.RecipeViewHolder> {
     private Context context;
     @NonNull private Recipe[] recipes = new Recipe[0];
     private final OnRecipeItemClickListener recipeItemClickListener;
@@ -26,7 +26,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
         void onRecipeItemClick(Recipe recipe);
     }
 
-    public RecipesAdapter(OnRecipeItemClickListener recipeItemClickListener) {
+    public RecipesRecyclerViewAdapter(OnRecipeItemClickListener recipeItemClickListener) {
         this.recipeItemClickListener = recipeItemClickListener;
     }
 
@@ -38,11 +38,6 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
     }
 
     @Override
-    public int getItemCount() {
-        return recipes.length;
-    }
-
-    @Override
     public void onBindViewHolder(RecipeViewHolder holder, int position) {
         Recipe recipe = recipes[position];
         holder.name.setText(recipe.name);
@@ -50,6 +45,11 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
                 context.getString(R.string.text_servings_placeholder),
                 recipe.servings));
         holder.image.setBackgroundResource(R.drawable.ic_assignment_ind_black_24dp);
+    }
+
+    @Override
+    public int getItemCount() {
+        return recipes.length;
     }
 
     public void setRecipesAndRefresh(@NonNull Recipe[] recipes) {

@@ -11,7 +11,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.lee.hansol.bakingtime.adapters.RecipesAdapter;
+import com.lee.hansol.bakingtime.adapters.RecipesRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.loaders.RecipesLoaderFromDb;
 import com.lee.hansol.bakingtime.loaders.RecipesLoaderFromInternet;
 import com.lee.hansol.bakingtime.models.Recipe;
@@ -22,13 +22,12 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Recipe[]>,
-        RecipesAdapter.OnRecipeItemClickListener {
-    private RecipesAdapter recipesAdapter;
+        RecipesRecyclerViewAdapter.OnRecipeItemClickListener {
+    private RecipesRecyclerViewAdapter recipesAdapter;
     private final int LOADER_ID_LOAD_RECIPES = 111;
 
     @BindView(R.id.activity_main_recyclerview) RecyclerView mainRecyclerView;
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         int colNum = getResources().getInteger(R.integer.main_grid_column_number);
         GridLayoutManager grid = new GridLayoutManager(this, colNum, LinearLayoutManager.VERTICAL, false);
         mainRecyclerView.setLayoutManager(grid);
-        recipesAdapter = new RecipesAdapter(this);
+        recipesAdapter = new RecipesRecyclerViewAdapter(this);
         mainRecyclerView.setAdapter(recipesAdapter);
     }
 

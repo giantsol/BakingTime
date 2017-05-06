@@ -3,6 +3,7 @@ package com.lee.hansol.bakingtime.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.R;
+import com.lee.hansol.bakingtime.adapters.IngredientsRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.models.Recipe;
 
 import butterknife.BindView;
@@ -19,6 +21,7 @@ import butterknife.Unbinder;
 public class RecipeStepListFragment extends Fragment {
     private Unbinder unbinder;
     private Recipe recipe;
+    private IngredientsRecyclerViewAdapter ingredientsViewAdapter;
 
     private final String BUNDLE_KEY_SAVED_RECIPE_OBJECT = "saved_recipe_object";
 
@@ -49,7 +52,10 @@ public class RecipeStepListFragment extends Fragment {
     }
 
     private void initializeIngredientsRecyclerView() {
-
+        ingredientsView.setHasFixedSize(true);
+        ingredientsView.setLayoutManager(new LinearLayoutManager(getContext()));
+        ingredientsViewAdapter = new IngredientsRecyclerViewAdapter(recipe.ingredients);
+        ingredientsView.setAdapter(ingredientsViewAdapter);
     }
 
     @Override
