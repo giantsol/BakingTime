@@ -53,7 +53,12 @@ public class RecipeStepListFragment extends Fragment {
 
     private void initializeIngredientsRecyclerView() {
         ingredientsView.setHasFixedSize(true);
-        ingredientsView.setLayoutManager(new LinearLayoutManager(getContext()));
+        ingredientsView.setLayoutManager(new LinearLayoutManager(getContext()) {
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        });
         ingredientsViewAdapter = new IngredientsRecyclerViewAdapter(recipe.ingredients);
         ingredientsView.setAdapter(ingredientsViewAdapter);
     }
