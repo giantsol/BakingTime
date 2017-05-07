@@ -17,9 +17,10 @@ import com.lee.hansol.bakingtime.models.Recipe;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
-import static android.R.attr.paddingTop;
+import static com.lee.hansol.bakingtime.utils.ToastUtils.toast;
 
 public class RecipeStepListFragment extends Fragment {
     private Unbinder unbinder;
@@ -29,6 +30,8 @@ public class RecipeStepListFragment extends Fragment {
 
     private final String BUNDLE_KEY_SAVED_RECIPE_OBJECT = "saved_recipe_object";
 
+    private boolean isIngredientsHidden = true;
+
     public static RecipeStepListFragment getInstance(Recipe recipe) {
         RecipeStepListFragment fragment = new RecipeStepListFragment();
         fragment.recipe = recipe;
@@ -37,7 +40,6 @@ public class RecipeStepListFragment extends Fragment {
 
     @BindView(R.id.ingredients_recyclerview) RecyclerView ingredientsRecyclerView;
     @BindView(R.id.fragment_recipe_step_list_recyclerview) RecyclerView stepsRecyclerView;
-    @BindView(R.id.ingredients) View wholeIngredientsView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -77,21 +79,16 @@ public class RecipeStepListFragment extends Fragment {
         stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         stepsViewAdapter = new StepsRecyclerViewAdapter(recipe.steps);
         stepsRecyclerView.setAdapter(stepsViewAdapter);
-
-        positionStepsRecyclerView();
     }
 
-    private void positionStepsRecyclerView() {
-        ViewTreeObserver observer = wholeIngredientsView.getViewTreeObserver();
-        if (observer.isAlive()) {
-            observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    wholeIngredientsView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    stepsRecyclerView.setPadding(0, wholeIngredientsView.getHeight(), 0, 0);
-                    stepsRecyclerView.getLayoutManager().scrollToPosition(0);
-                }
-            });
+    @OnClick(R.id.ingredients_header)
+    public void onIngredientsHeaderClick() {
+        if (isIngredientsHidden) {
+            ingredientsRecyclerView.setVisibility(View.VISIBLE);
+            isIngredientsHidden = false;
+        } else {
+            ingredientsRecyclerView.setVisibility(View.GONE);
+            isIngredientsHidden = true;
         }
     }
 
