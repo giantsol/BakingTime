@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.adapters.IngredientsRecyclerViewAdapter;
@@ -19,6 +18,8 @@ import com.lee.hansol.bakingtime.models.Recipe;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
+import static android.R.attr.paddingTop;
 
 public class RecipeStepListFragment extends Fragment {
     private Unbinder unbinder;
@@ -34,8 +35,9 @@ public class RecipeStepListFragment extends Fragment {
         return fragment;
     }
 
-    @BindView(R.id.ingredients_recyclerview) RecyclerView ingredientsView;
-    @BindView(R.id.fragment_recipe_step_list_recyclerview) RecyclerView stepsView;
+    @BindView(R.id.ingredients_recyclerview) RecyclerView ingredientsRecyclerView;
+    @BindView(R.id.fragment_recipe_step_list_recyclerview) RecyclerView stepsRecyclerView;
+    @BindView(R.id.ingredients) View wholeIngredientsView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -43,26 +45,8 @@ public class RecipeStepListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_recipe_step_list, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        final View ingredients = view.findViewById(R.id.ingredients);
-        ViewTreeObserver observer = ingredients.getViewTreeObserver();
-        if (observer.isAlive()) {
-            observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    ingredients.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    setPaddingToStepsView(ingredients.getHeight());
-                }
-            });
-        }
-
-        initializeIngredientsRecyclerView();
-        initializeStepsRecyclerView();
+        initialize();
         return view;
-    }
-
-    private void setPaddingToStepsView(int paddingTop) {
-        stepsView.setPadding(0, paddingTop, 0, 0);
-        stepsView.getLayoutManager().scrollToPosition(0);
     }
 
     private void restoreSavedStateIfExists(@Nullable Bundle savedInstanceState) {
@@ -71,23 +55,44 @@ public class RecipeStepListFragment extends Fragment {
         }
     }
 
+    private void initialize() {
+        initializeIngredientsRecyclerView();
+        initializeStepsRecyclerView();
+    }
+
     private void initializeIngredientsRecyclerView() {
-        ingredientsView.setHasFixedSize(true);
-        ingredientsView.setLayoutManager(new LinearLayoutManager(getContext()) {
+        ingredientsRecyclerView.setHasFixedSize(true);
+        ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()) {
             @Override
             public boolean canScrollVertically() {
                 return false;
             }
         });
         ingredientsViewAdapter = new IngredientsRecyclerViewAdapter(recipe.ingredients);
-        ingredientsView.setAdapter(ingredientsViewAdapter);
+        ingredientsRecyclerView.setAdapter(ingredientsViewAdapter);
     }
 
     private void initializeStepsRecyclerView() {
-        stepsView.setHasFixedSize(true);
-        stepsView.setLayoutManager(new LinearLayoutManager(getContext()));
+        stepsRecyclerView.setHasFixedSize(true);
+        stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         stepsViewAdapter = new StepsRecyclerViewAdapter(recipe.steps);
-        stepsView.setAdapter(stepsViewAdapter);
+        stepsRecyclerView.setAdapter(stepsViewAdapter);
+
+        positionStepsRecyclerView();
+    }
+
+    private void positionStepsRecyclerView() {
+        ViewTreeObserver observer = wholeIngredientsView.getViewTreeObserver();
+        if (observer.isAlive()) {
+            observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    wholeIngredientsView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    stepsRecyclerView.setPadding(0, wholeIngredientsView.getHeight(), 0, 0);
+                    stepsRecyclerView.getLayoutManager().scrollToPosition(0);
+                }
+            });
+        }
     }
 
     @Override
