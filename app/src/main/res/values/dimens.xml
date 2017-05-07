@@ -15,4 +15,5 @@
     <dimen name="textsize_very_big">30sp</dimen>
 
     <dimen name="shadow_height">10dp</dimen>
+    <dimen name="sliding_panel_height">80dp</dimen>
 </resources>

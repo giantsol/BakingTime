@@ -68,6 +68,26 @@ public class RecipesRecyclerViewAdapter extends RecyclerView.Adapter<RecipesRecy
         notifyDataSetChanged();
     }
 
+    class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        @BindView(R.id.recipe_list_item_name) TextView name;
+        @BindView(R.id.recipe_list_item_servings) TextView servings;
+        @BindView(R.id.recipe_list_item_image) ImageView image;
+        @BindView(R.id.recipe_list_item_parent) CardView parent;
+
+        RecipeViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            recipeItemClickAnimator.setTarget(v);
+            recipeItemClickAnimatorListener.whichRecipe = getAdapterPosition();
+            recipeItemClickAnimator.start();
+        }
+    }
+
     private class RecipeItemClickAnimatorListener implements Animator.AnimatorListener {
         int whichRecipe = 0;
 
@@ -89,26 +109,6 @@ public class RecipesRecyclerViewAdapter extends RecyclerView.Adapter<RecipesRecy
         @Override
         public void onAnimationRepeat(Animator animation) {
 
-        }
-    }
-
-    class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        @BindView(R.id.recipe_list_item_name) TextView name;
-        @BindView(R.id.recipe_list_item_servings) TextView servings;
-        @BindView(R.id.recipe_list_item_image) ImageView image;
-        @BindView(R.id.recipe_list_item_parent) CardView parent;
-
-        RecipeViewHolder(View view) {
-            super(view);
-            ButterKnife.bind(this, view);
-            view.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            recipeItemClickAnimator.setTarget(v);
-            recipeItemClickAnimatorListener.whichRecipe = getAdapterPosition();
-            recipeItemClickAnimator.start();
         }
     }
 }
