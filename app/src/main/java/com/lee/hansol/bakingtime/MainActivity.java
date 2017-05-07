@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         int colNum = getResources().getInteger(R.integer.main_grid_column_number);
         GridLayoutManager grid = new GridLayoutManager(this, colNum, LinearLayoutManager.VERTICAL, false);
         mainRecyclerView.setLayoutManager(grid);
-        recipesAdapter = new RecipesRecyclerViewAdapter(this);
+        recipesAdapter = new RecipesRecyclerViewAdapter(this, this);
         mainRecyclerView.setAdapter(recipesAdapter);
     }
 

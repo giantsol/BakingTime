@@ -6,9 +6,20 @@
         android:valueTo="4dp"
         android:valueType="floatType" />
     <objectAnimator
-        android:duration="100"
+        android:duration="50"
+        android:propertyName="translationY"
+        android:valueTo="-4dp"
+        android:valueType="floatType"/>
+    <objectAnimator
+        android:duration="50"
         android:propertyName="cardElevation"
         android:valueTo="1dp"
         android:valueType="floatType"
         android:startOffset="50" />
+    <objectAnimator
+        android:duration="50"
+        android:propertyName="translationY"
+        android:valueTo="0dp"
+        android:valueType="floatType"
+        android:startOffset="50"/>
 </set>
