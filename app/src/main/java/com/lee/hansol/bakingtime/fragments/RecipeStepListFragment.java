@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.R;
@@ -42,9 +43,26 @@ public class RecipeStepListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_recipe_step_list, container, false);
         unbinder = ButterKnife.bind(this, view);
 
+        final View ingredients = view.findViewById(R.id.ingredients);
+        ViewTreeObserver observer = ingredients.getViewTreeObserver();
+        if (observer.isAlive()) {
+            observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    ingredients.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    setPaddingToStepsView(ingredients.getHeight());
+                }
+            });
+        }
+
         initializeIngredientsRecyclerView();
         initializeStepsRecyclerView();
         return view;
+    }
+
+    private void setPaddingToStepsView(int paddingTop) {
+        stepsView.setPadding(0, paddingTop, 0, 0);
+        stepsView.getLayoutManager().scrollToPosition(0);
     }
 
     private void restoreSavedStateIfExists(@Nullable Bundle savedInstanceState) {
