@@ -21,7 +21,7 @@ public class IngredientsRecyclerViewAdapter
     private Context context;
     @NonNull private final Ingredient[] ingredients;
 
-    public IngredientsRecyclerViewAdapter(Ingredient[] ingredients) {
+    public IngredientsRecyclerViewAdapter(@NonNull Ingredient[] ingredients) {
         this.ingredients = ingredients;
     }
 

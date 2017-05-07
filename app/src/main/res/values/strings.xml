@@ -19,4 +19,5 @@
     <string name="text_servings_placeholder">Servings: %d</string>
     <string name="text_ingredients">Ingredients</string>
     <string name="text_ingredient_placeholder">%1$d %2$s : %3$d %4$s</string>
+    <string name="text_step_placeholder">%1$d. %2$s</string>
 </resources>

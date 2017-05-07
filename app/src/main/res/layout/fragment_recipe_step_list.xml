@@ -13,14 +13,10 @@
         android:layout_height="@dimen/shadow_height"
         app:layout_constraintTop_toBottomOf="@id/ingredients"
         android:background="@drawable/shadow_background"/>
-    <TextView
-        android:id="@+id/temp"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        app:layout_constraintTop_toBottomOf="@id/ingredients"/>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/fragment_recipe_step_list_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/ingredients"/>
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/ingredients"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </android.support.constraint.ConstraintLayout>

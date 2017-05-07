@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.adapters.IngredientsRecyclerViewAdapter;
+import com.lee.hansol.bakingtime.adapters.StepsRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.models.Recipe;
 
 import butterknife.BindView;
@@ -22,6 +23,7 @@ public class RecipeStepListFragment extends Fragment {
     private Unbinder unbinder;
     private Recipe recipe;
     private IngredientsRecyclerViewAdapter ingredientsViewAdapter;
+    private StepsRecyclerViewAdapter stepsViewAdapter;
 
     private final String BUNDLE_KEY_SAVED_RECIPE_OBJECT = "saved_recipe_object";
 
@@ -32,7 +34,7 @@ public class RecipeStepListFragment extends Fragment {
     }
 
     @BindView(R.id.ingredients_recyclerview) RecyclerView ingredientsView;
-    @BindView(R.id.temp) TextView temp;
+    @BindView(R.id.fragment_recipe_step_list_recyclerview) RecyclerView stepsView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -41,7 +43,7 @@ public class RecipeStepListFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
 
         initializeIngredientsRecyclerView();
-        temp.setText(recipe.name);
+        initializeStepsRecyclerView();
         return view;
     }
 
@@ -61,6 +63,13 @@ public class RecipeStepListFragment extends Fragment {
         });
         ingredientsViewAdapter = new IngredientsRecyclerViewAdapter(recipe.ingredients);
         ingredientsView.setAdapter(ingredientsViewAdapter);
+    }
+
+    private void initializeStepsRecyclerView() {
+        stepsView.setHasFixedSize(true);
+        stepsView.setLayoutManager(new LinearLayoutManager(getContext()));
+        stepsViewAdapter = new StepsRecyclerViewAdapter(recipe.steps);
+        stepsView.setAdapter(stepsViewAdapter);
     }
 
     @Override
