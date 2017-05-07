@@ -7,6 +7,10 @@
         android:id="@+id/step_list_item_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/spacing_small"
-        style="@style/normalTextStyle"/>
+        style="@style/recipeStepStyle"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_alignParentBottom="true"/>
 </RelativeLayout>

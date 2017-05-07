@@ -20,4 +20,11 @@
         <item name="android:textSize">@dimen/textsize_normal</item>
         <item name="android:textColor">@android:color/black</item>
     </style>
+    <style name="recipeStepStyle">
+        <item name="android:padding">@dimen/spacing_big</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">@dimen/textsize_big</item>
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+    </style>
 </resources>
