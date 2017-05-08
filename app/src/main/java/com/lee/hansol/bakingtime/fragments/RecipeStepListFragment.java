@@ -20,8 +20,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-import static com.lee.hansol.bakingtime.utils.LogUtils.log;
-
 public class RecipeStepListFragment extends Fragment {
     private Unbinder unbinder;
     private Recipe recipe;
@@ -31,16 +29,16 @@ public class RecipeStepListFragment extends Fragment {
 
     private final String BUNDLE_KEY_SAVED_RECIPE_OBJECT = "saved_recipe_object";
 
+    @BindView(R.id.fragment_recipe_step_list_ingredients_view) RecyclerView ingredientsRecyclerView;
+    @BindView(R.id.fragment_recipe_step_list_steps_view) RecyclerView stepsRecyclerView;
+    @BindView(R.id.fragment_recipe_step_list_slider) SlidingUpPanelLayout slider;
+    @BindView(R.id.fragment_recipe_step_list_click_prevent_screen) View transparentScreen;
+
     public static RecipeStepListFragment getInstance(Recipe recipe) {
         RecipeStepListFragment fragment = new RecipeStepListFragment();
         fragment.recipe = recipe;
         return fragment;
     }
-
-    @BindView(R.id.fragment_recipe_step_list_ingredients_view) RecyclerView ingredientsRecyclerView;
-    @BindView(R.id.fragment_recipe_step_list_steps_view) RecyclerView stepsRecyclerView;
-    @BindView(R.id.fragment_recipe_step_list_slider) SlidingUpPanelLayout slider;
-    @BindView(R.id.fragment_recipe_step_list_click_prevent_screen) View transparentScreen;
 
     @Override
     public void onAttach(Context context) {
@@ -59,34 +57,7 @@ public class RecipeStepListFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
 
         initialize();
-
-        slider.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-            @Override
-            public void onPanelSlide(View panel, float slideOffset) {
-
-            }
-
-            @Override
-            public void onPanelStateChanged(View panel,
-                                            SlidingUpPanelLayout.PanelState previousState,
-                                            SlidingUpPanelLayout.PanelState newState) {
-                boolean isSliderExpanded = newState == SlidingUpPanelLayout.PanelState.EXPANDED;
-                if (isSliderExpanded) {
-                    disableStepListClick();
-                } else {
-                    enableStepListClick();
-                }
-            }
-        });
         return view;
-    }
-
-    private void disableStepListClick() {
-        transparentScreen.setVisibility(View.VISIBLE);
-    }
-
-    private void enableStepListClick() {
-        transparentScreen.setVisibility(View.GONE);
     }
 
     private void restoreSavedStateIfExists(@Nullable Bundle savedInstanceState) {
@@ -98,6 +69,7 @@ public class RecipeStepListFragment extends Fragment {
     private void initialize() {
         initializeIngredientsRecyclerView();
         initializeStepsRecyclerView();
+        slider.addPanelSlideListener(sliderListener);
     }
 
     private void initializeIngredientsRecyclerView() {
@@ -119,6 +91,32 @@ public class RecipeStepListFragment extends Fragment {
         stepsRecyclerView.setAdapter(stepsViewAdapter);
     }
 
+    private SlidingUpPanelLayout.PanelSlideListener sliderListener = new SlidingUpPanelLayout.PanelSlideListener() {
+        @Override
+        public void onPanelSlide(View panel, float slideOffset) {
+
+        }
+
+        @Override
+        public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState,
+                                        SlidingUpPanelLayout.PanelState newState) {
+            boolean isSliderExpanded = newState == SlidingUpPanelLayout.PanelState.EXPANDED;
+            if (isSliderExpanded) {
+                disableStepListClick();
+            } else {
+                enableStepListClick();
+            }
+        }
+    };
+
+    private void disableStepListClick() {
+        transparentScreen.setVisibility(View.VISIBLE);
+    }
+
+    private void enableStepListClick() {
+        transparentScreen.setVisibility(View.GONE);
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(BUNDLE_KEY_SAVED_RECIPE_OBJECT, recipe);
@@ -128,5 +126,6 @@ public class RecipeStepListFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        slider.removePanelSlideListener(sliderListener);
     }
 }

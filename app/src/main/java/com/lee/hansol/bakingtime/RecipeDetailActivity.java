@@ -17,7 +17,6 @@ import static com.lee.hansol.bakingtime.utils.ToastUtils.toast;
 public class RecipeDetailActivity extends AppCompatActivity
         implements StepsRecyclerViewAdapter.OnStepItemClickListener {
     private Recipe recipe;
-    private boolean isTablet = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,7 +29,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void initialize() {
-        isTablet = findViewById(R.id.activity_recipe_detail_step_list_fragment_container) != null;
+        boolean isTablet = findViewById(R.id.activity_recipe_detail_step_list_fragment_container) != null;
         recipe = getIntent().getParcelableExtra(MainActivity.INTENT_EXTRA_RECIPE_OBJECT);
         if (isTablet) setTabletLayout();
         else setNonTabletLayout();

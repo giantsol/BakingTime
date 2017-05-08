@@ -22,6 +22,7 @@ import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 public class StepsRecyclerViewAdapter
         extends RecyclerView.Adapter<StepsRecyclerViewAdapter.StepViewHolder> {
     private Context context;
+
     @NonNull private final Step[] steps;
     private final OnStepItemClickListener stepItemClickListener;
 
@@ -65,7 +66,6 @@ public class StepsRecyclerViewAdapter
 
         @OnClick(R.id.step_list_item_text)
         void onClick() {
-
             Step step = steps[getAdapterPosition()];
             stepItemClickListener.onStepItemClick(step);
         }

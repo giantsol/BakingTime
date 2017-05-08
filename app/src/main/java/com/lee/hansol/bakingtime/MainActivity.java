@@ -28,13 +28,14 @@ import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Recipe[]>,
         RecipesRecyclerViewAdapter.OnRecipeItemClickListener {
     private RecipesRecyclerViewAdapter recipesAdapter;
+
     private final int LOADER_ID_LOAD_RECIPES = 111;
+    public static final String INTENT_EXTRA_RECIPE_OBJECT = "recipe_object";
 
     @BindView(R.id.activity_main_recyclerview) RecyclerView mainRecyclerView;
 
-    public static final String INTENT_EXTRA_RECIPE_OBJECT = "recipe_object";
-
-    @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
