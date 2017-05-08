@@ -65,7 +65,7 @@ public class StepsRecyclerViewAdapter
 
         @OnClick(R.id.step_list_item_text)
         void onClick() {
-            log("clicked");
+
             Step step = steps[getAdapterPosition()];
             stepItemClickListener.onStepItemClick(step);
         }

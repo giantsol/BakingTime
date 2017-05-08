@@ -14,10 +14,13 @@ import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.adapters.IngredientsRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.adapters.StepsRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.models.Recipe;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
+import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 public class RecipeStepListFragment extends Fragment {
     private Unbinder unbinder;
@@ -36,6 +39,8 @@ public class RecipeStepListFragment extends Fragment {
 
     @BindView(R.id.fragment_recipe_step_list_ingredients_view) RecyclerView ingredientsRecyclerView;
     @BindView(R.id.fragment_recipe_step_list_steps_view) RecyclerView stepsRecyclerView;
+    @BindView(R.id.fragment_recipe_step_list_slider) SlidingUpPanelLayout slider;
+    @BindView(R.id.fragment_recipe_step_list_click_prevent_screen) View transparentScreen;
 
     @Override
     public void onAttach(Context context) {
@@ -54,7 +59,34 @@ public class RecipeStepListFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
 
         initialize();
+
+        slider.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel,
+                                            SlidingUpPanelLayout.PanelState previousState,
+                                            SlidingUpPanelLayout.PanelState newState) {
+                boolean isSliderExpanded = newState == SlidingUpPanelLayout.PanelState.EXPANDED;
+                if (isSliderExpanded) {
+                    disableStepListClick();
+                } else {
+                    enableStepListClick();
+                }
+            }
+        });
         return view;
+    }
+
+    private void disableStepListClick() {
+        transparentScreen.setVisibility(View.VISIBLE);
+    }
+
+    private void enableStepListClick() {
+        transparentScreen.setVisibility(View.GONE);
     }
 
     private void restoreSavedStateIfExists(@Nullable Bundle savedInstanceState) {
