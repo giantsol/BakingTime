@@ -56,6 +56,7 @@ public class RecipeDetailActivity extends AppCompatActivity
         Object[] temp = getIntent().getParcelableArrayExtra(INTENT_EXTRA_ALL_RECIPES);
         recipes = Arrays.copyOf(temp, temp.length, Recipe[].class);
         recipeIndex = getIntent().getIntExtra(INTENT_EXTRA_RECIPE_INDEX, 0);
+        getSupportActionBar().setTitle(recipes[recipeIndex].name);
         initializeDrawer();
     }
 
