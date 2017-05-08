@@ -15,13 +15,22 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 public class StepsRecyclerViewAdapter
         extends RecyclerView.Adapter<StepsRecyclerViewAdapter.StepViewHolder> {
     private Context context;
     @NonNull private final Step[] steps;
+    private final OnStepItemClickListener stepItemClickListener;
 
-    public StepsRecyclerViewAdapter(@NonNull Step[] steps) {
+    public interface OnStepItemClickListener {
+        void onStepItemClick(Step step);
+    }
+
+    public StepsRecyclerViewAdapter(OnStepItemClickListener stepItemClickListener, @NonNull Step[] steps) {
+        this.stepItemClickListener = stepItemClickListener;
         this.steps = steps;
     }
 
@@ -52,6 +61,13 @@ public class StepsRecyclerViewAdapter
         StepViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
+        }
+
+        @OnClick(R.id.step_list_item_text)
+        void onClick() {
+            log("clicked");
+            Step step = steps[getAdapterPosition()];
+            stepItemClickListener.onStepItemClick(step);
         }
     }
 }

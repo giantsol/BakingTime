@@ -1,5 +1,6 @@
 package com.lee.hansol.bakingtime.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,13 +19,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-import static com.lee.hansol.bakingtime.utils.ToastUtils.toast;
-
 public class RecipeStepListFragment extends Fragment {
     private Unbinder unbinder;
     private Recipe recipe;
     private IngredientsRecyclerViewAdapter ingredientsViewAdapter;
     private StepsRecyclerViewAdapter stepsViewAdapter;
+    private StepsRecyclerViewAdapter.OnStepItemClickListener stepItemClickListener;
 
     private final String BUNDLE_KEY_SAVED_RECIPE_OBJECT = "saved_recipe_object";
 
@@ -36,6 +36,16 @@ public class RecipeStepListFragment extends Fragment {
 
     @BindView(R.id.fragment_recipe_step_list_ingredients_view) RecyclerView ingredientsRecyclerView;
     @BindView(R.id.fragment_recipe_step_list_steps_view) RecyclerView stepsRecyclerView;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            stepItemClickListener = (StepsRecyclerViewAdapter.OnStepItemClickListener) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(getActivity().toString() + " must implement OnStepItemClickListener");
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -73,7 +83,7 @@ public class RecipeStepListFragment extends Fragment {
     private void initializeStepsRecyclerView() {
         stepsRecyclerView.setHasFixedSize(true);
         stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        stepsViewAdapter = new StepsRecyclerViewAdapter(recipe.steps);
+        stepsViewAdapter = new StepsRecyclerViewAdapter(stepItemClickListener, recipe.steps);
         stepsRecyclerView.setAdapter(stepsViewAdapter);
     }
 

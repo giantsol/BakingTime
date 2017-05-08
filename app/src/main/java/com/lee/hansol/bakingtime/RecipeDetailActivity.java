@@ -4,13 +4,18 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
+import com.lee.hansol.bakingtime.adapters.StepsRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.fragments.RecipeStepDetailFragment;
 import com.lee.hansol.bakingtime.fragments.RecipeStepListFragment;
 import com.lee.hansol.bakingtime.models.Recipe;
+import com.lee.hansol.bakingtime.models.Step;
 
 import butterknife.ButterKnife;
 
-public class RecipeDetailActivity extends AppCompatActivity {
+import static com.lee.hansol.bakingtime.utils.ToastUtils.toast;
+
+public class RecipeDetailActivity extends AppCompatActivity
+        implements StepsRecyclerViewAdapter.OnStepItemClickListener {
     private Recipe recipe;
     private boolean isTablet = false;
 
@@ -45,5 +50,10 @@ public class RecipeDetailActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.activity_recipe_detail_fragment_container, stepListFragment)
                 .commit();
+    }
+
+    @Override
+    public void onStepItemClick(Step step) {
+        toast(this, step.shortDescription);
     }
 }
