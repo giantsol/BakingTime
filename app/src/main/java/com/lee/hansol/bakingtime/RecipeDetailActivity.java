@@ -6,12 +6,17 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.lee.hansol.bakingtime.adapters.DrawerRecyclerViewAdapter;
+import com.lee.hansol.bakingtime.adapters.RecipesRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.adapters.StepsRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.fragments.RecipeStepDetailFragment;
 import com.lee.hansol.bakingtime.fragments.RecipeStepListFragment;
@@ -37,9 +42,10 @@ public class RecipeDetailActivity extends AppCompatActivity
     private ActionBarDrawerToggle drawerToggle;
     private RecipeStepListFragment stepListFragment;
     private RecipeStepDetailFragment stepDetailFragment;
+    private DrawerRecyclerViewAdapter drawerAdapter;
 
     @BindView(R.id.activity_recipe_detail_navigation_drawer) DrawerLayout drawer;
-    @BindView(R.id.activity_recipe_detail_navigation_drawer_view) ListView drawerView;
+    @BindView(R.id.activity_recipe_detail_navigation_drawer_view) RecyclerView drawerView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,18 +89,10 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void initializeDrawerView() {
-        ArrayList<String> names = new ArrayList<>(recipes.length);
-        for (Recipe recipe : recipes) {
-            names.add(recipe.name);
-        }
-        drawerView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
-                names.toArray(new String[0])));
-        drawerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                toast(RecipeDetailActivity.this, (String) parent.getItemAtPosition(position));
-            }
-        });
+        drawerView.setHasFixedSize(true);
+        drawerView.setLayoutManager(new LinearLayoutManager(this));
+        drawerAdapter = new DrawerRecyclerViewAdapter(this, recipes);
+        drawerView.setAdapter(drawerAdapter);
     }
 
     private void addFragments() {
