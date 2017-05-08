@@ -26,9 +26,9 @@ public class RecipesRecyclerViewAdapter extends RecyclerView.Adapter<RecipesRecy
     private Context context;
     @NonNull private Recipe[] recipes = new Recipe[0];
     private final OnRecipeItemClickListener recipeItemClickListener;
-    private int clickedRecipeIndex;
 
     private final Animator recipeItemClickAnimator;
+    private final RecipeItemClickAnimatorListener recipeItemClickAnimatorListener;
 
     public interface OnRecipeItemClickListener {
         void onRecipeItemClick(Recipe recipe);
@@ -38,6 +38,7 @@ public class RecipesRecyclerViewAdapter extends RecyclerView.Adapter<RecipesRecy
         this.context = context;
         this.recipeItemClickListener = recipeItemClickListener;
         this.recipeItemClickAnimator = AnimatorInflater.loadAnimator(context, R.animator.raise);
+        this.recipeItemClickAnimatorListener = new RecipeItemClickAnimatorListener();
         this.recipeItemClickAnimator.addListener(recipeItemClickAnimatorListener);
     }
 
@@ -82,12 +83,13 @@ public class RecipesRecyclerViewAdapter extends RecyclerView.Adapter<RecipesRecy
         @Override
         public void onClick(View v) {
             recipeItemClickAnimator.setTarget(v);
-            clickedRecipeIndex = getAdapterPosition();
+            recipeItemClickAnimatorListener.whichRecipe = getAdapterPosition();
             recipeItemClickAnimator.start();
         }
     }
 
-    private Animator.AnimatorListener recipeItemClickAnimatorListener = new Animator.AnimatorListener() {
+    private class RecipeItemClickAnimatorListener implements Animator.AnimatorListener {
+        int whichRecipe = 0;
 
         @Override
         public void onAnimationStart(Animator animation) {
@@ -96,7 +98,7 @@ public class RecipesRecyclerViewAdapter extends RecyclerView.Adapter<RecipesRecy
 
         @Override
         public void onAnimationEnd(Animator animation) {
-            recipeItemClickListener.onRecipeItemClick(recipes[clickedRecipeIndex]);
+            recipeItemClickListener.onRecipeItemClick(recipes[whichRecipe]);
         }
 
         @Override
@@ -108,5 +110,5 @@ public class RecipesRecyclerViewAdapter extends RecyclerView.Adapter<RecipesRecy
         public void onAnimationRepeat(Animator animation) {
 
         }
-    };
+    }
 }
