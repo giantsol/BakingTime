@@ -30,7 +30,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private RecipesRecyclerViewAdapter recipesAdapter;
 
     private final int LOADER_ID_LOAD_RECIPES = 111;
-    public static final String INTENT_EXTRA_RECIPE_OBJECT = "recipe_object";
+    public static final String INTENT_EXTRA_ALL_RECIPES = "all_recipes";
+    public static final String INTENT_EXTRA_RECIPE_INDEX = "recipe_index";
 
     @BindView(R.id.activity_main_recyclerview) RecyclerView mainRecyclerView;
 
@@ -86,13 +87,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onRecipeItemClick(Recipe recipe) {
-        startRecipeDetailActivityWith(recipe);
+    public void onRecipeItemClick(int recipeIndex) {
+        startRecipeDetailActivityWith(recipeIndex);
     }
 
-    private void startRecipeDetailActivityWith(Recipe recipe) {
+    private void startRecipeDetailActivityWith(int recipeIndex) {
         Intent intent = new Intent(this, RecipeDetailActivity.class);
-        intent.putExtra(INTENT_EXTRA_RECIPE_OBJECT, recipe);
+        intent.putExtra(INTENT_EXTRA_ALL_RECIPES, recipesAdapter.recipes);
+        intent.putExtra(INTENT_EXTRA_RECIPE_INDEX, recipeIndex);
         startActivity(intent);
     }
 

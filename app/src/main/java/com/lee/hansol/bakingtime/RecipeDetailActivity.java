@@ -12,22 +12,27 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.lee.hansol.bakingtime.adapters.RecipesRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.adapters.StepsRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.fragments.RecipeStepDetailFragment;
 import com.lee.hansol.bakingtime.fragments.RecipeStepListFragment;
 import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.models.Step;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.lee.hansol.bakingtime.MainActivity.INTENT_EXTRA_ALL_RECIPES;
+import static com.lee.hansol.bakingtime.MainActivity.INTENT_EXTRA_RECIPE_INDEX;
 import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 import static com.lee.hansol.bakingtime.utils.ToastUtils.toast;
 
 public class RecipeDetailActivity extends AppCompatActivity
         implements StepsRecyclerViewAdapter.OnStepItemClickListener {
-    private Recipe recipe;
+    private Recipe[] recipes;
+    private int recipeIndex;
     private ActionBarDrawerToggle drawerToggle;
 
     @BindView(R.id.activity_recipe_detail_navigation_drawer) DrawerLayout drawer;
@@ -45,12 +50,15 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void initialize() {
-        recipe = getIntent().getParcelableExtra(MainActivity.INTENT_EXTRA_RECIPE_OBJECT);
+        Object[] temp = getIntent().getParcelableArrayExtra(INTENT_EXTRA_ALL_RECIPES);
+        recipes = Arrays.copyOf(temp, temp.length, Recipe[].class);
+        recipeIndex = getIntent().getIntExtra(INTENT_EXTRA_RECIPE_INDEX, 0);
         initializeDrawer();
     }
 
     private void initializeDrawer() {
         drawerToggle = new ActionBarDrawerToggle(this, drawer, R.string.content_description_drawer_open, R.string.content_description_drawer_close) {
+            Recipe recipe = recipes[recipeIndex];
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
@@ -71,8 +79,12 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void initializeDrawerView() {
+        ArrayList<String> names = new ArrayList<>(recipes.length);
+        for (Recipe recipe : recipes) {
+            names.add(recipe.name);
+        }
         drawerView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
-                new String[]{"hello", "there"}));
+                names.toArray(new String[0])));
         drawerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -88,7 +100,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void setTabletLayout() {
-        RecipeStepListFragment stepListFragment = RecipeStepListFragment.getInstance(recipe);
+        RecipeStepListFragment stepListFragment = RecipeStepListFragment.getInstance(recipes[recipeIndex]);
         RecipeStepDetailFragment stepDetailFragment = new RecipeStepDetailFragment();
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.activity_recipe_detail_step_list_fragment_container, stepListFragment)
@@ -97,7 +109,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void setNonTabletLayout() {
-        RecipeStepListFragment stepListFragment = RecipeStepListFragment.getInstance(recipe);
+        RecipeStepListFragment stepListFragment = RecipeStepListFragment.getInstance(recipes[recipeIndex]);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.activity_recipe_detail_fragment_container, stepListFragment)
                 .commit();

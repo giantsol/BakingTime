@@ -22,14 +22,14 @@ import butterknife.ButterKnife;
 
 public class RecipesRecyclerViewAdapter extends RecyclerView.Adapter<RecipesRecyclerViewAdapter.RecipeViewHolder> {
     private Context context;
-    @NonNull private Recipe[] recipes = new Recipe[0];
+    @NonNull public Recipe[] recipes = new Recipe[0];
 
     private final OnRecipeItemClickListener recipeItemClickListener;
     private final Animator recipeItemClickAnimator;
     private final RecipeItemClickAnimatorListener recipeItemClickAnimatorListener;
 
     public interface OnRecipeItemClickListener {
-        void onRecipeItemClick(Recipe recipe);
+        void onRecipeItemClick(int recipeIndex);
     }
 
     public RecipesRecyclerViewAdapter(Context context, OnRecipeItemClickListener recipeItemClickListener) {
@@ -50,7 +50,7 @@ public class RecipesRecyclerViewAdapter extends RecyclerView.Adapter<RecipesRecy
 
         @Override
         public void onAnimationEnd(Animator animation) {
-            recipeItemClickListener.onRecipeItemClick(recipes[whichRecipe]);
+            recipeItemClickListener.onRecipeItemClick(whichRecipe);
         }
 
         @Override
