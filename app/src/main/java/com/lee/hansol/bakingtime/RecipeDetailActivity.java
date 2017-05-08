@@ -33,7 +33,10 @@ public class RecipeDetailActivity extends AppCompatActivity
         implements StepsRecyclerViewAdapter.OnStepItemClickListener {
     private Recipe[] recipes;
     private int recipeIndex;
+    private boolean isTablet;
     private ActionBarDrawerToggle drawerToggle;
+    private RecipeStepListFragment stepListFragment;
+    private RecipeStepDetailFragment stepDetailFragment;
 
     @BindView(R.id.activity_recipe_detail_navigation_drawer) DrawerLayout drawer;
     @BindView(R.id.activity_recipe_detail_navigation_drawer_view) ListView drawerView;
@@ -94,14 +97,14 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void addFragments() {
-        boolean isTablet = findViewById(R.id.activity_recipe_detail_step_list_fragment_container) != null;
+        isTablet = findViewById(R.id.activity_recipe_detail_step_list_fragment_container) != null;
         if (isTablet) setTabletLayout();
         else setNonTabletLayout();
     }
 
     private void setTabletLayout() {
-        RecipeStepListFragment stepListFragment = RecipeStepListFragment.getInstance(recipes[recipeIndex]);
-        RecipeStepDetailFragment stepDetailFragment = new RecipeStepDetailFragment();
+        stepListFragment = RecipeStepListFragment.getInstance(recipes[recipeIndex]);
+        stepDetailFragment = new RecipeStepDetailFragment();
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.activity_recipe_detail_step_list_fragment_container, stepListFragment)
                 .add(R.id.activity_recipe_detail_step_detail_fragment_container, stepDetailFragment)
@@ -109,7 +112,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void setNonTabletLayout() {
-        RecipeStepListFragment stepListFragment = RecipeStepListFragment.getInstance(recipes[recipeIndex]);
+        stepListFragment = RecipeStepListFragment.getInstance(recipes[recipeIndex]);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.activity_recipe_detail_fragment_container, stepListFragment)
                 .commit();
@@ -130,6 +133,36 @@ public class RecipeDetailActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawer.isDrawerOpen(drawerView))
+            drawer.closeDrawer(drawerView);
+        else if (isSliderOpenFromStepListFragment()) {
+            closeSliderFromStepListFragment();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private boolean isSliderOpenFromStepListFragment() {
+        if (stepListFragment == null) stepListFragment = getStepListFragmentFromContainer();
+        return stepListFragment != null && stepListFragment.isSliderOpen;
+    }
+
+    private RecipeStepListFragment getStepListFragmentFromContainer() {
+        if (isTablet)
+            return (RecipeStepListFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.activity_recipe_detail_step_list_fragment_container);
+        else
+            return (RecipeStepListFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.activity_recipe_detail_fragment_container);
+    }
+
+    private void closeSliderFromStepListFragment() {
+        if (stepListFragment != null)
+            stepListFragment.closeSlider();
     }
 
     @Override

@@ -20,12 +20,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
+import static com.lee.hansol.bakingtime.utils.LogUtils.log;
+
 public class RecipeStepListFragment extends Fragment {
     private Unbinder unbinder;
     private Recipe recipe;
     private IngredientsRecyclerViewAdapter ingredientsViewAdapter;
     private StepsRecyclerViewAdapter stepsViewAdapter;
     private StepsRecyclerViewAdapter.OnStepItemClickListener stepItemClickListener;
+    public boolean isSliderOpen = false;
 
     private final String BUNDLE_KEY_SAVED_RECIPE_OBJECT = "saved_recipe_object";
 
@@ -100,8 +103,8 @@ public class RecipeStepListFragment extends Fragment {
         @Override
         public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState,
                                         SlidingUpPanelLayout.PanelState newState) {
-            boolean isSliderExpanded = newState == SlidingUpPanelLayout.PanelState.EXPANDED;
-            if (isSliderExpanded) {
+            isSliderOpen = newState == SlidingUpPanelLayout.PanelState.EXPANDED;
+            if (isSliderOpen) {
                 disableStepListClick();
             } else {
                 enableStepListClick();
@@ -115,6 +118,10 @@ public class RecipeStepListFragment extends Fragment {
 
     private void enableStepListClick() {
         transparentScreen.setVisibility(View.GONE);
+    }
+
+    public void closeSlider() {
+        slider.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
     }
 
     @Override
