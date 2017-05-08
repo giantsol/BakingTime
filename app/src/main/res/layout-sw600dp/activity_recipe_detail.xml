@@ -11,14 +11,12 @@
         android:baselineAligned="true">
         <FrameLayout
             android:id="@+id/activity_recipe_detail_step_list_fragment_container"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_width="@dimen/tablet_step_list_view_width"
+            android:layout_height="match_parent"/>
         <FrameLayout
             android:id="@+id/activity_recipe_detail_step_detail_fragment_container"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="2"/>
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </LinearLayout>
     <ListView
         android:id="@+id/activity_recipe_detail_navigation_drawer_view"
