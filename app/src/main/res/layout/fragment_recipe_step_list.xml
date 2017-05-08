@@ -23,22 +23,20 @@
             android:clickable="true"
             android:visibility="gone"/>
     </FrameLayout>
-    <android.support.constraint.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
         <TextView
             android:id="@+id/ingredients_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            sothree:layout_constraintTop_toTopOf="parent"
             android:gravity="center"
             android:text="@string/text_ingredients"
             style="@style/h2TextStyle" />
         <android.support.v7.widget.RecyclerView
             android:id="@+id/fragment_recipe_step_list_ingredients_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            sothree:layout_constraintTop_toBottomOf="@id/ingredients_header"/>
-    </android.support.constraint.ConstraintLayout>
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>
-

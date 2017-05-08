@@ -126,6 +126,5 @@ public class RecipeStepListFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-        slider.removePanelSlideListener(sliderListener);
     }
 }
