@@ -91,7 +91,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     private void initializeDrawerView() {
         drawerView.setHasFixedSize(true);
         drawerView.setLayoutManager(new LinearLayoutManager(this));
-        drawerAdapter = new DrawerRecyclerViewAdapter(this, recipes);
+        drawerAdapter = new DrawerRecyclerViewAdapter(this, recipes, recipeIndex);
         drawerView.setAdapter(drawerAdapter);
     }
 

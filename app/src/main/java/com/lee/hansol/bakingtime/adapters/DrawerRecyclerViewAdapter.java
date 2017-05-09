@@ -20,10 +20,12 @@ public class DrawerRecyclerViewAdapter
         extends RecyclerView.Adapter<DrawerRecyclerViewAdapter.ItemViewHolder> {
     private Context context;
     @NonNull private final Recipe[] recipes;
+    private int recipeIndex;
 
-    public DrawerRecyclerViewAdapter(Context context, @NonNull Recipe[] recipes) {
+    public DrawerRecyclerViewAdapter(Context context, @NonNull Recipe[] recipes, int recipeIndex) {
         this.context = context;
         this.recipes = recipes;
+        this.recipeIndex = recipeIndex;
     }
 
     @Override
@@ -38,6 +40,11 @@ public class DrawerRecyclerViewAdapter
         Recipe recipe = recipes[position];
         holder.imageView.setImageResource(R.drawable.ic_assignment_ind_black_24dp);
         holder.textView.setText(recipe.name);
+
+        if (position == recipeIndex) {
+            holder.parent.setBackgroundResource(android.R.color.darker_gray);
+            holder.parent.setClickable(false);
+        }
     }
 
     @Override
@@ -46,6 +53,7 @@ public class DrawerRecyclerViewAdapter
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.drawer_list_item_parent) ViewGroup parent;
         @BindView(R.id.drawer_list_item_imageview) ImageView imageView;
         @BindView(R.id.drawer_list_item_textview) TextView textView;
 
