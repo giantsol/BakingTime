@@ -47,8 +47,6 @@ public class Recipe implements Parcelable {
         dest.writeString(name);
         dest.writeArray(ingredients);
         dest.writeArray(steps);
-//        dest.writeParcelableArray(ingredients, flags);
-//        dest.writeParcelableArray(steps, flags);
         dest.writeInt(servings);
         dest.writeString(imageUrlString);
     }
@@ -65,4 +63,17 @@ public class Recipe implements Parcelable {
         }
 
     };
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if ((obj == null) || !(obj instanceof Recipe)) return false;
+        final Recipe that = (Recipe) obj;
+        return this.recipeId == that.recipeId;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.recipeId;
+    }
 }

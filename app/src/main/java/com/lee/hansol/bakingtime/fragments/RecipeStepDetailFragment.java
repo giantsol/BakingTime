@@ -8,20 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.lee.hansol.bakingtime.R;
-import com.lee.hansol.bakingtime.models.Step;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class RecipeStepDetailFragment extends Fragment {
     private Unbinder unbinder;
-    private Step step;
-
-    public static RecipeStepDetailFragment getInstance(Step step) {
-        RecipeStepDetailFragment fragment = new RecipeStepDetailFragment();
-        fragment.step = step;
-        return fragment;
-    }
 
     @Nullable
     @Override

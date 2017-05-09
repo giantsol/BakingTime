@@ -3,6 +3,8 @@ package com.lee.hansol.bakingtime.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import static android.R.attr.name;
+
 public class Step implements Parcelable {
     public int recipeId;
     public int stepOrder;
@@ -56,4 +58,23 @@ public class Step implements Parcelable {
             return new Step[i];
         }
     };
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if ((obj == null) || !(obj instanceof Step)) return false;
+        final Step that = (Step) obj;
+        return (this.recipeId == that.recipeId) && (this.stepOrder == that.stepOrder)
+                && (this.shortDescription.equals(that.shortDescription));
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 31 * hash + recipeId;
+        hash = 31 * hash + stepOrder;
+        hash = 31 * hash + (shortDescription == null ? 0 : shortDescription.hashCode());
+        return hash;
+    }
+
 }

@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.adapters.IngredientsRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.adapters.StepsRecyclerViewAdapter;
-import com.lee.hansol.bakingtime.models.Recipe;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import butterknife.BindView;
@@ -22,24 +21,13 @@ import butterknife.Unbinder;
 
 public class RecipeStepListFragment extends Fragment {
     private Unbinder unbinder;
-    private Recipe recipe;
-    private IngredientsRecyclerViewAdapter ingredientsViewAdapter;
-    private StepsRecyclerViewAdapter stepsViewAdapter;
     private StepsRecyclerViewAdapter.OnStepItemClickListener stepItemClickListener;
     public boolean isSliderOpen = false;
-
-    private final String BUNDLE_KEY_SAVED_RECIPE_OBJECT = "saved_recipe_object";
 
     @BindView(R.id.fragment_recipe_step_list_ingredients_view) RecyclerView ingredientsRecyclerView;
     @BindView(R.id.fragment_recipe_step_list_steps_view) RecyclerView stepsRecyclerView;
     @BindView(R.id.fragment_recipe_step_list_slider) SlidingUpPanelLayout slider;
     @BindView(R.id.fragment_recipe_step_list_click_prevent_screen) View transparentScreen;
-
-    public static RecipeStepListFragment getInstance(Recipe recipe) {
-        RecipeStepListFragment fragment = new RecipeStepListFragment();
-        fragment.recipe = recipe;
-        return fragment;
-    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -53,18 +41,10 @@ public class RecipeStepListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        restoreSavedStateIfExists(savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_recipe_step_list, container, false);
         unbinder = ButterKnife.bind(this, view);
-
         initialize();
         return view;
-    }
-
-    private void restoreSavedStateIfExists(@Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            recipe = savedInstanceState.getParcelable(BUNDLE_KEY_SAVED_RECIPE_OBJECT);
-        }
     }
 
     private void initialize() {
@@ -81,15 +61,13 @@ public class RecipeStepListFragment extends Fragment {
                 return false;
             }
         });
-        ingredientsViewAdapter = new IngredientsRecyclerViewAdapter(recipe.ingredients);
-        ingredientsRecyclerView.setAdapter(ingredientsViewAdapter);
+        ingredientsRecyclerView.setAdapter(new IngredientsRecyclerViewAdapter());
     }
 
     private void initializeStepsRecyclerView() {
         stepsRecyclerView.setHasFixedSize(true);
         stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        stepsViewAdapter = new StepsRecyclerViewAdapter(stepItemClickListener, recipe.steps);
-        stepsRecyclerView.setAdapter(stepsViewAdapter);
+        stepsRecyclerView.setAdapter(new StepsRecyclerViewAdapter(stepItemClickListener));
     }
 
     private SlidingUpPanelLayout.PanelSlideListener sliderListener = new SlidingUpPanelLayout.PanelSlideListener() {
@@ -120,16 +98,6 @@ public class RecipeStepListFragment extends Fragment {
 
     public void closeSlider() {
         slider.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(BUNDLE_KEY_SAVED_RECIPE_OBJECT, recipe);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.R;
+import com.lee.hansol.bakingtime.helpers.DataHelper;
 import com.lee.hansol.bakingtime.models.Step;
 
 import java.util.Locale;
@@ -23,16 +24,14 @@ public class StepsRecyclerViewAdapter
         extends RecyclerView.Adapter<StepsRecyclerViewAdapter.StepViewHolder> {
     private Context context;
 
-    @NonNull private final Step[] steps;
     private final OnStepItemClickListener stepItemClickListener;
 
     public interface OnStepItemClickListener {
         void onStepItemClick(int stepIndex);
     }
 
-    public StepsRecyclerViewAdapter(OnStepItemClickListener stepItemClickListener, @NonNull Step[] steps) {
+    public StepsRecyclerViewAdapter(OnStepItemClickListener stepItemClickListener) {
         this.stepItemClickListener = stepItemClickListener;
-        this.steps = steps;
     }
 
     @Override
@@ -44,16 +43,18 @@ public class StepsRecyclerViewAdapter
 
     @Override
     public void onBindViewHolder(StepViewHolder holder, int position) {
-        Step step = steps[position];
-        String text = String.format(Locale.getDefault(),
-                context.getString(R.string.text_step_placeholder),
-                step.stepOrder, step.shortDescription);
-        holder.textView.setText(text);
+        Step step = DataHelper.getInstance().getStepObjectAt(position);
+        if (step != null) {
+            String text = String.format(Locale.getDefault(),
+                    context.getString(R.string.text_step_placeholder),
+                    step.stepOrder, step.shortDescription);
+            holder.textView.setText(text);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return steps.length;
+        return DataHelper.getInstance().getAllSteps().length;
     }
 
     class StepViewHolder extends RecyclerView.ViewHolder {

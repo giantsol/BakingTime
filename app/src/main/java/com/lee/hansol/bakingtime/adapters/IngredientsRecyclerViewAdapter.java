@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.R;
+import com.lee.hansol.bakingtime.helpers.DataHelper;
 import com.lee.hansol.bakingtime.models.Ingredient;
 
 import java.util.Locale;
@@ -19,11 +20,6 @@ import butterknife.ButterKnife;
 public class IngredientsRecyclerViewAdapter
         extends RecyclerView.Adapter<IngredientsRecyclerViewAdapter.IngredientViewHolder> {
     private Context context;
-    @NonNull private final Ingredient[] ingredients;
-
-    public IngredientsRecyclerViewAdapter(@NonNull Ingredient[] ingredients) {
-        this.ingredients = ingredients;
-    }
 
     @Override
     public IngredientViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -35,16 +31,18 @@ public class IngredientsRecyclerViewAdapter
 
     @Override
     public void onBindViewHolder(IngredientViewHolder holder, int position) {
-        Ingredient ingredient = ingredients[position];
-        String text = String.format(Locale.getDefault(),
-                context.getString(R.string.text_ingredient_placeholder),
-                position+1, ingredient.name, ingredient.quantity, ingredient.measureUnit);
-        holder.textView.setText(text);
+        Ingredient ingredient = DataHelper.getInstance().getIngredientObjectAt(position);
+        if (ingredient != null) {
+            String text = String.format(Locale.getDefault(),
+                    context.getString(R.string.text_ingredient_placeholder),
+                    position + 1, ingredient.name, ingredient.quantity, ingredient.measureUnit);
+            holder.textView.setText(text);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return ingredients.length;
+        return DataHelper.getInstance().getAllIngredients().length;
     }
 
     class IngredientViewHolder extends RecyclerView.ViewHolder {

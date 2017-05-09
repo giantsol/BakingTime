@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.R;
+import com.lee.hansol.bakingtime.helpers.DataHelper;
 import com.lee.hansol.bakingtime.models.Recipe;
 
 import butterknife.BindView;
@@ -20,18 +21,13 @@ import butterknife.OnClick;
 public class DrawerRecyclerViewAdapter
         extends RecyclerView.Adapter<DrawerRecyclerViewAdapter.ItemViewHolder> {
     private Context context;
-    @NonNull private final Recipe[] recipes;
-    private int recipeIndex;
     private final OnDrawerItemClickListener drawerItemClickListener;
 
     public interface OnDrawerItemClickListener {
         void onDrawerItemClick(int recipeIndex);
     }
 
-    public DrawerRecyclerViewAdapter(@NonNull Recipe[] recipes,
-                                     int recipeIndex, OnDrawerItemClickListener listener) {
-        this.recipes = recipes;
-        this.recipeIndex = recipeIndex;
+    public DrawerRecyclerViewAdapter(OnDrawerItemClickListener listener) {
         this.drawerItemClickListener = listener;
     }
 
@@ -45,16 +41,12 @@ public class DrawerRecyclerViewAdapter
 
     @Override
     public void onBindViewHolder(ItemViewHolder holder, int position) {
-        Recipe recipe = recipes[position];
-        if (isCurrentRecipe(position)) {
+        Recipe recipe = DataHelper.getInstance().getRecipeObjectAt(position);
+        if (DataHelper.getInstance().getCurrentRecipeObject() == recipe) {
             setCurrentRecipeView(holder, recipe);
         } else {
             setOtherRecipeView(holder, recipe);
         }
-    }
-
-    private boolean isCurrentRecipe(int position) {
-        return recipeIndex == position;
     }
 
     private void setCurrentRecipeView(ItemViewHolder holder, Recipe recipe) {
@@ -77,7 +69,7 @@ public class DrawerRecyclerViewAdapter
 
     @Override
     public int getItemCount() {
-        return recipes.length;
+        return DataHelper.getInstance().getAllRecipes().length;
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
@@ -92,8 +84,7 @@ public class DrawerRecyclerViewAdapter
 
         @OnClick(R.id.drawer_list_item_parent)
         void onClick() {
-            recipeIndex = getAdapterPosition();
-            drawerItemClickListener.onDrawerItemClick(recipeIndex);
+            drawerItemClickListener.onDrawerItemClick(getAdapterPosition());
             notifyDataSetChanged();
         }
     }

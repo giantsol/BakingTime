@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.lee.hansol.bakingtime.adapters.RecipesRecyclerViewAdapter;
+import com.lee.hansol.bakingtime.helpers.DataHelper;
 import com.lee.hansol.bakingtime.loaders.RecipesLoaderFromDb;
 import com.lee.hansol.bakingtime.loaders.RecipesLoaderFromInternet;
 import com.lee.hansol.bakingtime.models.Recipe;
@@ -32,8 +33,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private RecipesRecyclerViewAdapter recipesAdapter;
 
     private final int LOADER_ID_LOAD_RECIPES = 111;
-    public static final String INTENT_EXTRA_ALL_RECIPES = "all_recipes";
-    public static final String INTENT_EXTRA_RECIPE_INDEX = "recipe_index";
 
     @BindView(R.id.activity_main_recyclerview) RecyclerView mainRecyclerView;
 
@@ -80,7 +79,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         log(String.format(Locale.getDefault(),
                 getString(R.string.log_number_of_recipes_loaded_placeholder),
                 recipes.length));
-        recipesAdapter.setRecipesAndRefresh(recipes);
+        DataHelper.getInstance().setRecipes(recipes);
+        recipesAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -90,14 +90,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onRecipeItemClick(int recipeIndex) {
-        startRecipeDetailActivityWith(recipeIndex);
+        DataHelper.getInstance().setCurrentRecipeIndex(recipeIndex);
+        startRecipeDetailActivity();
     }
 
-    private void startRecipeDetailActivityWith(int recipeIndex) {
-        Intent intent = new Intent(this, RecipeDetailActivity.class);
-        intent.putExtra(INTENT_EXTRA_ALL_RECIPES, recipesAdapter.recipes);
-        intent.putExtra(INTENT_EXTRA_RECIPE_INDEX, recipeIndex);
-        startActivity(intent);
+    private void startRecipeDetailActivity() {
+        startActivity(new Intent(this, RecipeDetailActivity.class));
     }
 
     @Override

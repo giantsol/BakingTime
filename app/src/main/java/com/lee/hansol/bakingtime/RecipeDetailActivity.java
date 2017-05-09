@@ -17,30 +17,21 @@ import com.lee.hansol.bakingtime.adapters.DrawerRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.adapters.StepsRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.fragments.RecipeStepDetailFragment;
 import com.lee.hansol.bakingtime.fragments.RecipeStepListFragment;
+import com.lee.hansol.bakingtime.helpers.DataHelper;
 import com.lee.hansol.bakingtime.models.Recipe;
-import com.lee.hansol.bakingtime.models.Step;
-
-import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.lee.hansol.bakingtime.MainActivity.INTENT_EXTRA_ALL_RECIPES;
-import static com.lee.hansol.bakingtime.MainActivity.INTENT_EXTRA_RECIPE_INDEX;
-import static com.lee.hansol.bakingtime.utils.ToastUtils.toast;
-
 public class RecipeDetailActivity extends AppCompatActivity
         implements StepsRecyclerViewAdapter.OnStepItemClickListener,
         DrawerRecyclerViewAdapter.OnDrawerItemClickListener{
-    private Recipe[] recipes;
-    private int recipeIndex;
-    private Recipe currentRecipe;
     private boolean isTablet;
     private boolean isReplacingFragment;
     private ActionBarDrawerToggle drawerToggle;
     private DrawerRecyclerViewAdapter drawerAdapter;
-    private RecipeStepListFragment currentStepListFragment;
-    private RecipeStepDetailFragment currentStepDetailFragment;
+    @Nullable private RecipeStepListFragment stepListFragment;
+    @Nullable private RecipeStepDetailFragment stepDetailFragment;
     private FragmentTransaction fragmentTransaction;
     private ActionBar actionBar;
 
@@ -57,7 +48,7 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     private void initialize(Bundle savedInstanceState) {
         initializeVariables();
-        setActionBarTitle(currentRecipe.name);
+        setActionBarTitleToCurrentRecipe();
         initializeDrawer();
 
         if (savedInstanceState == null)
@@ -65,9 +56,6 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void initializeVariables() {
-        recipes = getRecipesFromCallingIntent();
-        recipeIndex = getRecipeIndexFromCallingIntent();
-        currentRecipe = recipes[recipeIndex];
         actionBar = getSupportActionBar();
         drawerToggle = new ActionBarDrawerToggle(this, drawer, R.string.content_description_drawer_open, R.string.content_description_drawer_close) {
             private boolean isDrawerDeterminedOpen = false;
@@ -89,7 +77,7 @@ public class RecipeDetailActivity extends AppCompatActivity
 
             private void determineClose() {
                 isDrawerDeterminedOpen = false;
-                setActionBarTitle(currentRecipe.name);
+                setActionBarTitleToCurrentRecipe();
 
                 if (isReplacingFragment) {
                     replaceStepListFragment();
@@ -114,13 +102,10 @@ public class RecipeDetailActivity extends AppCompatActivity
                         R.animator.fragment_slide_right_enter, R.animator.fragment_lisde_right_exit);
     }
 
-    private Recipe[] getRecipesFromCallingIntent() {
-        Object[] temp = getIntent().getParcelableArrayExtra(INTENT_EXTRA_ALL_RECIPES);
-        return Arrays.copyOf(temp, temp.length, Recipe[].class);
-    }
-
-    private int getRecipeIndexFromCallingIntent() {
-        return getIntent().getIntExtra(INTENT_EXTRA_RECIPE_INDEX, 0);
+    private void setActionBarTitleToCurrentRecipe() {
+        Recipe currentRecipe = DataHelper.getInstance().getCurrentRecipeObject();
+        if (actionBar != null && currentRecipe != null)
+            actionBar.setTitle(currentRecipe.name);
     }
 
     private void setActionBarTitle(String title) {
@@ -143,26 +128,25 @@ public class RecipeDetailActivity extends AppCompatActivity
     private void initializeDrawerView() {
         drawerView.setHasFixedSize(true);
         drawerView.setLayoutManager(new LinearLayoutManager(this));
-        drawerAdapter = new DrawerRecyclerViewAdapter(recipes, recipeIndex, this);
+        drawerAdapter = new DrawerRecyclerViewAdapter(this);
         drawerView.setAdapter(drawerAdapter);
     }
 
     private void initializeFragmentContainers() {
+        stepListFragment = new RecipeStepListFragment();
         isTablet = findViewById(R.id.activity_recipe_detail_step_list_fragment_container) != null;
-        if (isTablet) initializeWithTabletLayout();
-        else initializeWithNonTabletLayout();
+        if (isTablet) initializeAsTabletLayout();
+        else initializeAsNonTabletLayout();
     }
 
-    private void initializeWithTabletLayout() {
-        currentStepListFragment = RecipeStepListFragment.getInstance(currentRecipe);
-        fragmentTransaction.add(R.id.activity_recipe_detail_step_list_fragment_container, currentStepListFragment)
+    private void initializeAsTabletLayout() {
+        fragmentTransaction.add(R.id.activity_recipe_detail_step_list_fragment_container, stepListFragment)
                 .commit();
         reloadFragmentTransaction();
     }
 
-    private void initializeWithNonTabletLayout() {
-        currentStepListFragment = RecipeStepListFragment.getInstance(currentRecipe);
-        fragmentTransaction.add(R.id.activity_recipe_detail_fragment_container, currentStepListFragment)
+    private void initializeAsNonTabletLayout() {
+        fragmentTransaction.add(R.id.activity_recipe_detail_fragment_container, stepListFragment)
                 .commit();
         reloadFragmentTransaction();
     }
@@ -173,36 +157,25 @@ public class RecipeDetailActivity extends AppCompatActivity
             drawer.closeDrawer(drawerView);
         else if (isIngredientsSliderOpen())
             closeIngredientsSlider();
-        else if (!isTablet && (currentStepDetailFragment != null)) {
+        else if (!isTablet && (getFragmentManager().getBackStackEntryCount() >= 1)) {
             getFragmentManager().popBackStack();
-            currentStepDetailFragment = null;
         } else
             super.onBackPressed();
     }
 
     private boolean isIngredientsSliderOpen() {
-        if (currentStepListFragment == null) currentStepListFragment = getStepListFragmentFromContainer();
-        return currentStepListFragment != null && currentStepListFragment.isSliderOpen;
-    }
-
-    private RecipeStepListFragment getStepListFragmentFromContainer() {
-        if (isTablet)
-            return (RecipeStepListFragment) getFragmentManager()
-                    .findFragmentById(R.id.activity_recipe_detail_step_list_fragment_container);
-        else
-            return (RecipeStepListFragment) getFragmentManager()
-                    .findFragmentById(R.id.activity_recipe_detail_fragment_container);
+        return stepListFragment != null && stepListFragment.isSliderOpen;
     }
 
     private void closeIngredientsSlider() {
-        if (currentStepListFragment != null)
-            currentStepListFragment.closeSlider();
+        if (stepListFragment != null) {
+            stepListFragment.closeSlider();
+        }
     }
 
     @Override
     public void onDrawerItemClick(int recipeIndex) {
-        this.recipeIndex = recipeIndex;
-        currentRecipe = recipes[recipeIndex];
+        DataHelper.getInstance().setCurrentRecipeIndex(recipeIndex);
         closeDrawerAndReplaceStepListFragment();
     }
 
@@ -212,39 +185,42 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void replaceStepListFragment() {
-        currentStepListFragment = RecipeStepListFragment.getInstance(currentRecipe);
+        stepListFragment = new RecipeStepListFragment();
         if (isTablet)
             fragmentTransaction
-                    .replace(R.id.activity_recipe_detail_step_list_fragment_container, currentStepListFragment)
+                    .replace(R.id.activity_recipe_detail_step_list_fragment_container, stepListFragment)
                     .commit();
         else
             fragmentTransaction
-                    .replace(R.id.activity_recipe_detail_fragment_container, currentStepListFragment)
+                    .replace(R.id.activity_recipe_detail_fragment_container, stepListFragment)
                     .commit();
 
         reloadFragmentTransaction();
-
-        if (currentStepDetailFragment != null) {
-            fragmentTransaction.remove(currentStepDetailFragment).commit();
-            currentStepDetailFragment = null;
-            reloadFragmentTransaction();
-        }
+        clearStepDetailFragmentContainerIfTablet();
     }
 
     private void reloadFragmentTransaction() {
         fragmentTransaction = getFragmentManager().beginTransaction()
-                .setCustomAnimations(R.animator.fragment_slide_left_enter, R.animator.fragment_slide_left_exit);
+                .setCustomAnimations(R.animator.fragment_slide_left_enter, R.animator.fragment_slide_left_exit,
+                        R.animator.fragment_slide_right_enter, R.animator.fragment_lisde_right_exit);
+    }
+
+    private void clearStepDetailFragmentContainerIfTablet() {
+        if (isTablet && (stepDetailFragment != null)) {
+            fragmentTransaction.remove(stepDetailFragment).commit();
+            reloadFragmentTransaction();
+        }
     }
 
     @Override
     public void onStepItemClick(int stepIndex) {
-        Step step = currentRecipe.steps[stepIndex];
-        currentStepDetailFragment = RecipeStepDetailFragment.getInstance(step);
+        DataHelper.getInstance().setCurrentStepIndex(stepIndex);
+        stepDetailFragment = new RecipeStepDetailFragment();
         if (isTablet) {
-            fragmentTransaction.replace(R.id.activity_recipe_detail_step_detail_fragment_container, currentStepDetailFragment)
+            fragmentTransaction.replace(R.id.activity_recipe_detail_step_detail_fragment_container, stepDetailFragment)
                     .commit();
         } else {
-            fragmentTransaction.replace(R.id.activity_recipe_detail_fragment_container, currentStepDetailFragment)
+            fragmentTransaction.replace(R.id.activity_recipe_detail_fragment_container, stepDetailFragment)
                     .addToBackStack(null)
                     .commit();
         }

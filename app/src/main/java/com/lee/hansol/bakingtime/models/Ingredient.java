@@ -47,4 +47,23 @@ public class Ingredient implements Parcelable {
             return new Ingredient[i];
         }
     };
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if ((obj == null) || !(obj instanceof  Ingredient)) return false;
+        final Ingredient that = (Ingredient) obj;
+        return (this.recipeId == that.recipeId) && (this.name.equals(that.name))
+                && (this.quantity == that.quantity);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 31 * hash + recipeId;
+        hash = 31 * hash + (name == null ? 0 : name.hashCode());
+        hash = 31 * hash + quantity;
+        return hash;
+    }
+
 }
