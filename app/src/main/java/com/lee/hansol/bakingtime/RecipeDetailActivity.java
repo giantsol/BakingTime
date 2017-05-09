@@ -27,7 +27,6 @@ import butterknife.ButterKnife;
 
 import static com.lee.hansol.bakingtime.MainActivity.INTENT_EXTRA_ALL_RECIPES;
 import static com.lee.hansol.bakingtime.MainActivity.INTENT_EXTRA_RECIPE_INDEX;
-import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 import static com.lee.hansol.bakingtime.utils.ToastUtils.toast;
 
 public class RecipeDetailActivity extends AppCompatActivity
@@ -37,10 +36,12 @@ public class RecipeDetailActivity extends AppCompatActivity
     private int recipeIndex;
     private Recipe currentRecipe;
     private boolean isTablet;
+    private boolean isReplacingFragment;
     private ActionBarDrawerToggle drawerToggle;
     private DrawerRecyclerViewAdapter drawerAdapter;
     private RecipeStepListFragment stepListFragment;
     private RecipeStepDetailFragment stepDetailFragment;
+    private FragmentTransaction fragmentReplaceTransaction;
     private ActionBar actionBar;
 
     @BindView(R.id.activity_recipe_detail_navigation_drawer) DrawerLayout drawer;
@@ -82,19 +83,33 @@ public class RecipeDetailActivity extends AppCompatActivity
 
             private void watchForClosing(float slideOffset) {
                 if (slideOffset < 0.5) {
-                    isDrawerDeterminedOpen = false;
-                    setActionBarTitle(currentRecipe.name);
+                    determineClose();
+                }
+            }
+
+            private void determineClose() {
+                isDrawerDeterminedOpen = false;
+                setActionBarTitle(currentRecipe.name);
+
+                if (isReplacingFragment) {
+                    replaceStepListFragment();
+                    isReplacingFragment = false;
                 }
             }
 
             private void watchForOpening(float slideOffset) {
                 if (slideOffset > 0.5) {
-                    isDrawerDeterminedOpen = true;
-                    setActionBarTitle(getString(R.string.text_choose_recipe));
+                    determineOpen();
                 }
             }
-        };
 
+            private void determineOpen() {
+                isDrawerDeterminedOpen = true;
+                setActionBarTitle(getString(R.string.text_choose_recipe));
+            }
+        };
+        fragmentReplaceTransaction = getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.animator.fragment_slide_left_enter, R.animator.fragment_slide_left_exit);
     }
 
     private Recipe[] getRecipesFromCallingIntent() {
@@ -185,23 +200,31 @@ public class RecipeDetailActivity extends AppCompatActivity
     public void onDrawerItemClick(int recipeIndex) {
         this.recipeIndex = recipeIndex;
         currentRecipe = recipes[recipeIndex];
-        setActionBarTitle(currentRecipe.name);
+        closeDrawerAndReplaceStepListFragment();
+    }
+
+    private void closeDrawerAndReplaceStepListFragment() {
+        isReplacingFragment = true;
         drawer.closeDrawer(drawerView);
-        replaceStepListFragment();
     }
 
     private void replaceStepListFragment() {
         stepListFragment = RecipeStepListFragment.getInstance(currentRecipe);
         if (isTablet)
-            getFragmentManager().beginTransaction()
-                    .setCustomAnimations(R.animator.fragment_slide_left_enter, R.animator.fragment_slide_left_exit)
+            fragmentReplaceTransaction
                     .replace(R.id.activity_recipe_detail_step_list_fragment_container, stepListFragment)
                     .commit();
         else
-            getFragmentManager().beginTransaction()
-                    .setCustomAnimations(R.animator.fragment_slide_left_enter, R.animator.fragment_slide_left_exit)
+            fragmentReplaceTransaction
                     .replace(R.id.activity_recipe_detail_fragment_container, stepListFragment)
                     .commit();
+
+        reloadFragmentReplaceTransactionObject();
+    }
+
+    private void reloadFragmentReplaceTransactionObject() {
+        fragmentReplaceTransaction = getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.animator.fragment_slide_left_enter, R.animator.fragment_slide_left_exit);
     }
 
     @Override
