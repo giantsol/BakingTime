@@ -24,6 +24,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.lee.hansol.bakingtime.utils.LogUtils.log;
+import static com.lee.hansol.bakingtime.utils.ToastUtils.isToastShowingWithMsg;
+import static com.lee.hansol.bakingtime.utils.ToastUtils.toast;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Recipe[]>,
         RecipesRecyclerViewAdapter.OnRecipeItemClickListener {
@@ -96,6 +98,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         intent.putExtra(INTENT_EXTRA_ALL_RECIPES, recipesAdapter.recipes);
         intent.putExtra(INTENT_EXTRA_RECIPE_INDEX, recipeIndex);
         startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        String quitString = getString(R.string.toast_really_exit_app);
+        if (isToastShowingWithMsg(quitString)) super.onBackPressed();
+        else toast(this, quitString);
     }
 
     @Override
