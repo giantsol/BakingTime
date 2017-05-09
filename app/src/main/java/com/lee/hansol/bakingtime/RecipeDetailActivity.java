@@ -1,5 +1,6 @@
 package com.lee.hansol.bakingtime;
 
+import android.app.FragmentTransaction;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -93,6 +94,7 @@ public class RecipeDetailActivity extends AppCompatActivity
                 }
             }
         };
+
     }
 
     private Recipe[] getRecipesFromCallingIntent() {
@@ -137,7 +139,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     private void initializeWithTabletLayout() {
         stepListFragment = RecipeStepListFragment.getInstance(currentRecipe);
         stepDetailFragment = new RecipeStepDetailFragment();
-        getSupportFragmentManager().beginTransaction()
+        getFragmentManager().beginTransaction()
                 .add(R.id.activity_recipe_detail_step_list_fragment_container, stepListFragment)
                 .add(R.id.activity_recipe_detail_step_detail_fragment_container, stepDetailFragment)
                 .commit();
@@ -145,7 +147,7 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     private void initializeWithNonTabletLayout() {
         stepListFragment = RecipeStepListFragment.getInstance(currentRecipe);
-        getSupportFragmentManager().beginTransaction()
+        getFragmentManager().beginTransaction()
                 .add(R.id.activity_recipe_detail_fragment_container, stepListFragment)
                 .commit();
     }
@@ -167,10 +169,10 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     private RecipeStepListFragment getStepListFragmentFromContainer() {
         if (isTablet)
-            return (RecipeStepListFragment) getSupportFragmentManager()
+            return (RecipeStepListFragment) getFragmentManager()
                     .findFragmentById(R.id.activity_recipe_detail_step_list_fragment_container);
         else
-            return (RecipeStepListFragment) getSupportFragmentManager()
+            return (RecipeStepListFragment) getFragmentManager()
                     .findFragmentById(R.id.activity_recipe_detail_fragment_container);
     }
 
@@ -191,11 +193,13 @@ public class RecipeDetailActivity extends AppCompatActivity
     private void replaceStepListFragment() {
         stepListFragment = RecipeStepListFragment.getInstance(currentRecipe);
         if (isTablet)
-            getSupportFragmentManager().beginTransaction()
+            getFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.animator.fragment_slide_left_enter, R.animator.fragment_slide_left_exit)
                     .replace(R.id.activity_recipe_detail_step_list_fragment_container, stepListFragment)
                     .commit();
         else
-            getSupportFragmentManager().beginTransaction()
+            getFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.animator.fragment_slide_left_enter, R.animator.fragment_slide_left_exit)
                     .replace(R.id.activity_recipe_detail_fragment_container, stepListFragment)
                     .commit();
     }

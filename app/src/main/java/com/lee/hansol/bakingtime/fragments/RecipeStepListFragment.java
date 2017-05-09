@@ -1,9 +1,9 @@
 package com.lee.hansol.bakingtime.fragments;
 
-import android.content.Context;
+import android.app.Activity;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,8 +19,6 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-
-import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 public class RecipeStepListFragment extends Fragment {
     private Unbinder unbinder;
@@ -44,8 +42,8 @@ public class RecipeStepListFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
         try {
             stepItemClickListener = (StepsRecyclerViewAdapter.OnStepItemClickListener) getActivity();
         } catch (ClassCastException e) {
@@ -77,7 +75,7 @@ public class RecipeStepListFragment extends Fragment {
 
     private void initializeIngredientsRecyclerView() {
         ingredientsRecyclerView.setHasFixedSize(true);
-        ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()) {
+        ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()) {
             @Override
             public boolean canScrollVertically() {
                 return false;
@@ -89,7 +87,7 @@ public class RecipeStepListFragment extends Fragment {
 
     private void initializeStepsRecyclerView() {
         stepsRecyclerView.setHasFixedSize(true);
-        stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         stepsViewAdapter = new StepsRecyclerViewAdapter(stepItemClickListener, recipe.steps);
         stepsRecyclerView.setAdapter(stepsViewAdapter);
     }
@@ -127,6 +125,11 @@ public class RecipeStepListFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(BUNDLE_KEY_SAVED_RECIPE_OBJECT, recipe);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override
