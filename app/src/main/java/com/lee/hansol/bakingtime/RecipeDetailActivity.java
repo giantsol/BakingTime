@@ -4,6 +4,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,11 +34,13 @@ public class RecipeDetailActivity extends AppCompatActivity
         DrawerRecyclerViewAdapter.OnDrawerItemClickListener{
     private Recipe[] recipes;
     private int recipeIndex;
+    private Recipe currentRecipe;
     private boolean isTablet;
     private ActionBarDrawerToggle drawerToggle;
+    private DrawerRecyclerViewAdapter drawerAdapter;
     private RecipeStepListFragment stepListFragment;
     private RecipeStepDetailFragment stepDetailFragment;
-    private DrawerRecyclerViewAdapter drawerAdapter;
+    private ActionBar actionBar;
 
     @BindView(R.id.activity_recipe_detail_navigation_drawer) DrawerLayout drawer;
     @BindView(R.id.activity_recipe_detail_navigation_drawer_view) RecyclerView drawerView;
@@ -47,62 +50,92 @@ public class RecipeDetailActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
         ButterKnife.bind(this);
-        initialize();
+        initialize(savedInstanceState);
+    }
+
+    private void initialize(Bundle savedInstanceState) {
+        initializeVariables();
+        setActionBarTitle(currentRecipe.name);
+        initializeDrawer();
 
         if (savedInstanceState == null)
-            addFragments();
+            initializeFragmentContainers();
     }
 
-    private void initialize() {
-        Object[] temp = getIntent().getParcelableArrayExtra(INTENT_EXTRA_ALL_RECIPES);
-        recipes = Arrays.copyOf(temp, temp.length, Recipe[].class);
-        recipeIndex = getIntent().getIntExtra(INTENT_EXTRA_RECIPE_INDEX, 0);
-        getSupportActionBar().setTitle(recipes[recipeIndex].name);
-        initializeDrawer();
-    }
-
-    private void initializeDrawer() {
+    private void initializeVariables() {
+        recipes = getRecipesFromCallingIntent();
+        recipeIndex = getRecipeIndexFromCallingIntent();
+        currentRecipe = recipes[recipeIndex];
+        actionBar = getSupportActionBar();
         drawerToggle = new ActionBarDrawerToggle(this, drawer, R.string.content_description_drawer_open, R.string.content_description_drawer_close) {
             private boolean isDrawerDeterminedOpen = false;
 
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 super.onDrawerSlide(drawerView, slideOffset);
-                if (isDrawerDeterminedOpen) {
-                    if (slideOffset < 0.5) {
-                        isDrawerDeterminedOpen = false;
-                        getSupportActionBar().setTitle(recipes[recipeIndex].name);
-                    }
-                } else {
-                    if (slideOffset > 0.5) {
-                        isDrawerDeterminedOpen = true;
-                        getSupportActionBar().setTitle(R.string.text_choose_recipe);
-                    }
+                if (isDrawerDeterminedOpen)
+                    watchForClosing(slideOffset);
+                else
+                    watchForOpening(slideOffset);
+            }
+
+            private void watchForClosing(float slideOffset) {
+                if (slideOffset < 0.5) {
+                    isDrawerDeterminedOpen = false;
+                    setActionBarTitle(currentRecipe.name);
+                }
+            }
+
+            private void watchForOpening(float slideOffset) {
+                if (slideOffset > 0.5) {
+                    isDrawerDeterminedOpen = true;
+                    setActionBarTitle(getString(R.string.text_choose_recipe));
                 }
             }
         };
+    }
+
+    private Recipe[] getRecipesFromCallingIntent() {
+        Object[] temp = getIntent().getParcelableArrayExtra(INTENT_EXTRA_ALL_RECIPES);
+        return Arrays.copyOf(temp, temp.length, Recipe[].class);
+    }
+
+    private int getRecipeIndexFromCallingIntent() {
+        return getIntent().getIntExtra(INTENT_EXTRA_RECIPE_INDEX, 0);
+    }
+
+    private void setActionBarTitle(String title) {
+        if (actionBar != null) actionBar.setTitle(title);
+    }
+
+    private void initializeDrawer() {
+        setupActionBar();
         drawer.addDrawerListener(drawerToggle);
         initializeDrawerView();
+    }
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+    private void setupActionBar() {
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
     }
 
     private void initializeDrawerView() {
         drawerView.setHasFixedSize(true);
         drawerView.setLayoutManager(new LinearLayoutManager(this));
-        drawerAdapter = new DrawerRecyclerViewAdapter(this, recipes, recipeIndex, this);
+        drawerAdapter = new DrawerRecyclerViewAdapter(recipes, recipeIndex, this);
         drawerView.setAdapter(drawerAdapter);
     }
 
-    private void addFragments() {
+    private void initializeFragmentContainers() {
         isTablet = findViewById(R.id.activity_recipe_detail_step_list_fragment_container) != null;
-        if (isTablet) setTabletLayout();
-        else setNonTabletLayout();
+        if (isTablet) initializeWithTabletLayout();
+        else initializeWithNonTabletLayout();
     }
 
-    private void setTabletLayout() {
-        stepListFragment = RecipeStepListFragment.getInstance(recipes[recipeIndex]);
+    private void initializeWithTabletLayout() {
+        stepListFragment = RecipeStepListFragment.getInstance(currentRecipe);
         stepDetailFragment = new RecipeStepDetailFragment();
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.activity_recipe_detail_step_list_fragment_container, stepListFragment)
@@ -110,11 +143,66 @@ public class RecipeDetailActivity extends AppCompatActivity
                 .commit();
     }
 
-    private void setNonTabletLayout() {
-        stepListFragment = RecipeStepListFragment.getInstance(recipes[recipeIndex]);
+    private void initializeWithNonTabletLayout() {
+        stepListFragment = RecipeStepListFragment.getInstance(currentRecipe);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.activity_recipe_detail_fragment_container, stepListFragment)
                 .commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawer.isDrawerOpen(drawerView))
+            drawer.closeDrawer(drawerView);
+        else if (isIngredientsSliderOpen())
+            closeIngredientsSlider();
+        else
+            super.onBackPressed();
+    }
+
+    private boolean isIngredientsSliderOpen() {
+        if (stepListFragment == null) stepListFragment = getStepListFragmentFromContainer();
+        return stepListFragment != null && stepListFragment.isSliderOpen;
+    }
+
+    private RecipeStepListFragment getStepListFragmentFromContainer() {
+        if (isTablet)
+            return (RecipeStepListFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.activity_recipe_detail_step_list_fragment_container);
+        else
+            return (RecipeStepListFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.activity_recipe_detail_fragment_container);
+    }
+
+    private void closeIngredientsSlider() {
+        if (stepListFragment != null)
+            stepListFragment.closeSlider();
+    }
+
+    @Override
+    public void onDrawerItemClick(int recipeIndex) {
+        this.recipeIndex = recipeIndex;
+        currentRecipe = recipes[recipeIndex];
+        setActionBarTitle(currentRecipe.name);
+        drawer.closeDrawer(drawerView);
+        replaceStepListFragment();
+    }
+
+    private void replaceStepListFragment() {
+        stepListFragment = RecipeStepListFragment.getInstance(currentRecipe);
+        if (isTablet)
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.activity_recipe_detail_step_list_fragment_container, stepListFragment)
+                    .commit();
+        else
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.activity_recipe_detail_fragment_container, stepListFragment)
+                    .commit();
+    }
+
+    @Override
+    public void onStepItemClick(Step step) {
+        toast(this, step.shortDescription);
     }
 
     @Override
@@ -134,55 +222,4 @@ public class RecipeDetailActivity extends AppCompatActivity
         return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onBackPressed() {
-        if (drawer.isDrawerOpen(drawerView))
-            drawer.closeDrawer(drawerView);
-        else if (isSliderOpenFromStepListFragment()) {
-            closeSliderFromStepListFragment();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    private boolean isSliderOpenFromStepListFragment() {
-        if (stepListFragment == null) stepListFragment = getStepListFragmentFromContainer();
-        return stepListFragment != null && stepListFragment.isSliderOpen;
-    }
-
-    private RecipeStepListFragment getStepListFragmentFromContainer() {
-        if (isTablet)
-            return (RecipeStepListFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.activity_recipe_detail_step_list_fragment_container);
-        else
-            return (RecipeStepListFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.activity_recipe_detail_fragment_container);
-    }
-
-    private void closeSliderFromStepListFragment() {
-        if (stepListFragment != null)
-            stepListFragment.closeSlider();
-    }
-
-    @Override
-    public void onDrawerItemClick(int recipeIndex) {
-        this.recipeIndex = recipeIndex;
-        drawer.closeDrawer(drawerView);
-        getSupportActionBar().setTitle(recipes[recipeIndex].name);
-
-        stepListFragment = RecipeStepListFragment.getInstance(recipes[recipeIndex]);
-        if (isTablet)
-            getSupportFragmentManager().beginTransaction()
-            .replace(R.id.activity_recipe_detail_step_list_fragment_container, stepListFragment)
-            .commit();
-        else
-            getSupportFragmentManager().beginTransaction()
-            .replace(R.id.activity_recipe_detail_fragment_container, stepListFragment)
-            .commit();
-    }
-
-    @Override
-    public void onStepItemClick(Step step) {
-        toast(this, step.shortDescription);
-    }
 }

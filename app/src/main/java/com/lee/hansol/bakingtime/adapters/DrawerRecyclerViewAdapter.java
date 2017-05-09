@@ -28,9 +28,8 @@ public class DrawerRecyclerViewAdapter
         void onDrawerItemClick(int recipeIndex);
     }
 
-    public DrawerRecyclerViewAdapter(Context context, @NonNull Recipe[] recipes,
+    public DrawerRecyclerViewAdapter(@NonNull Recipe[] recipes,
                                      int recipeIndex, OnDrawerItemClickListener listener) {
-        this.context = context;
         this.recipes = recipes;
         this.recipeIndex = recipeIndex;
         this.drawerItemClickListener = listener;
@@ -38,6 +37,7 @@ public class DrawerRecyclerViewAdapter
 
     @Override
     public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        context = parent.getContext();
         View holderView = LayoutInflater.from(context)
                 .inflate(R.layout.drawer_list_item, parent, false);
         return new ItemViewHolder(holderView);
@@ -46,20 +46,33 @@ public class DrawerRecyclerViewAdapter
     @Override
     public void onBindViewHolder(ItemViewHolder holder, int position) {
         Recipe recipe = recipes[position];
+        if (isCurrentRecipe(position)) {
+            setCurrentRecipeView(holder, recipe);
+        } else {
+            setOtherRecipeView(holder, recipe);
+        }
+    }
+
+    private boolean isCurrentRecipe(int position) {
+        return recipeIndex == position;
+    }
+
+    private void setCurrentRecipeView(ItemViewHolder holder, Recipe recipe) {
         holder.imageView.setImageResource(R.drawable.ic_assignment_ind_black_24dp);
         holder.textView.setText(recipe.name);
+        holder.parent.setBackgroundResource(android.R.color.darker_gray);
+        holder.parent.setClickable(false);
+    }
 
-        if (position == recipeIndex) {
-            holder.parent.setBackgroundResource(android.R.color.darker_gray);
-            holder.parent.setClickable(false);
-        } else {
-            int[] attrs = new int[]{R.attr.selectableItemBackground};
-            TypedArray typedArray = context.obtainStyledAttributes(attrs);
-            int backgroundResource = typedArray.getResourceId(0, 0);
-            holder.parent.setBackgroundResource(backgroundResource);
-            typedArray.recycle();
-            holder.parent.setClickable(true);
-        }
+    private void setOtherRecipeView(ItemViewHolder holder, Recipe recipe) {
+        holder.imageView.setImageResource(R.drawable.ic_assignment_ind_black_24dp);
+        holder.textView.setText(recipe.name);
+        int[] attrs = new int[]{R.attr.selectableItemBackground};
+        TypedArray typedArray = context.obtainStyledAttributes(attrs);
+        int backgroundResource = typedArray.getResourceId(0, 0);
+        holder.parent.setBackgroundResource(backgroundResource);
+        typedArray.recycle();
+        holder.parent.setClickable(true);
     }
 
     @Override
