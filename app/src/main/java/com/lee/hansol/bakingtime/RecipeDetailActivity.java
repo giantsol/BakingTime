@@ -169,6 +169,15 @@ public class RecipeDetailActivity extends AppCompatActivity
     public void onDrawerItemClick(int recipeIndex) {
         this.recipeIndex = recipeIndex;
 
+        stepListFragment = RecipeStepListFragment.getInstance(recipes[recipeIndex]);
+        if (isTablet)
+            getSupportFragmentManager().beginTransaction()
+            .replace(R.id.activity_recipe_detail_step_list_fragment_container, stepListFragment)
+            .commit();
+        else
+            getSupportFragmentManager().beginTransaction()
+            .replace(R.id.activity_recipe_detail_fragment_container, stepListFragment)
+            .commit();
     }
 
     @Override
