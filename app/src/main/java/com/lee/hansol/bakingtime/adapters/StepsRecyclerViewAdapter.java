@@ -27,7 +27,7 @@ public class StepsRecyclerViewAdapter
     private final OnStepItemClickListener stepItemClickListener;
 
     public interface OnStepItemClickListener {
-        void onStepItemClick(Step step);
+        void onStepItemClick(int stepIndex);
     }
 
     public StepsRecyclerViewAdapter(OnStepItemClickListener stepItemClickListener, @NonNull Step[] steps) {
@@ -66,8 +66,7 @@ public class StepsRecyclerViewAdapter
 
         @OnClick(R.id.step_list_item_text)
         void onClick() {
-            Step step = steps[getAdapterPosition()];
-            stepItemClickListener.onStepItemClick(step);
+            stepItemClickListener.onStepItemClick(getAdapterPosition());
         }
     }
 }
