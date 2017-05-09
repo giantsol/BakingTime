@@ -6,24 +6,18 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import com.lee.hansol.bakingtime.adapters.DrawerRecyclerViewAdapter;
-import com.lee.hansol.bakingtime.adapters.RecipesRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.adapters.StepsRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.fragments.RecipeStepDetailFragment;
 import com.lee.hansol.bakingtime.fragments.RecipeStepListFragment;
 import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.models.Step;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import butterknife.BindView;
@@ -69,17 +63,22 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     private void initializeDrawer() {
         drawerToggle = new ActionBarDrawerToggle(this, drawer, R.string.content_description_drawer_open, R.string.content_description_drawer_close) {
-            Recipe recipe = recipes[recipeIndex];
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-                getSupportActionBar().setTitle(recipe.name);
-            }
+            private boolean isDrawerDeterminedOpen = false;
 
             @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle(R.string.text_choose_recipe);
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, slideOffset);
+                if (isDrawerDeterminedOpen) {
+                    if (slideOffset < 0.5) {
+                        isDrawerDeterminedOpen = false;
+                        getSupportActionBar().setTitle(recipes[recipeIndex].name);
+                    }
+                } else {
+                    if (slideOffset > 0.5) {
+                        isDrawerDeterminedOpen = true;
+                        getSupportActionBar().setTitle(R.string.text_choose_recipe);
+                    }
+                }
             }
         };
         drawer.addDrawerListener(drawerToggle);
@@ -168,6 +167,8 @@ public class RecipeDetailActivity extends AppCompatActivity
     @Override
     public void onDrawerItemClick(int recipeIndex) {
         this.recipeIndex = recipeIndex;
+        drawer.closeDrawer(drawerView);
+        getSupportActionBar().setTitle(recipes[recipeIndex].name);
 
         stepListFragment = RecipeStepListFragment.getInstance(recipes[recipeIndex]);
         if (isTablet)
