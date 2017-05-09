@@ -1,6 +1,7 @@
 package com.lee.hansol.bakingtime.adapters;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,22 +11,29 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.R;
-import com.lee.hansol.bakingtime.models.Ingredient;
 import com.lee.hansol.bakingtime.models.Recipe;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class DrawerRecyclerViewAdapter
         extends RecyclerView.Adapter<DrawerRecyclerViewAdapter.ItemViewHolder> {
     private Context context;
     @NonNull private final Recipe[] recipes;
     private int recipeIndex;
+    private final OnDrawerItemClickListener drawerItemClickListener;
 
-    public DrawerRecyclerViewAdapter(Context context, @NonNull Recipe[] recipes, int recipeIndex) {
+    public interface OnDrawerItemClickListener {
+        void onDrawerItemClick(int recipeIndex);
+    }
+
+    public DrawerRecyclerViewAdapter(Context context, @NonNull Recipe[] recipes,
+                                     int recipeIndex, OnDrawerItemClickListener listener) {
         this.context = context;
         this.recipes = recipes;
         this.recipeIndex = recipeIndex;
+        this.drawerItemClickListener = listener;
     }
 
     @Override
@@ -44,6 +52,13 @@ public class DrawerRecyclerViewAdapter
         if (position == recipeIndex) {
             holder.parent.setBackgroundResource(android.R.color.darker_gray);
             holder.parent.setClickable(false);
+        } else {
+            int[] attrs = new int[]{R.attr.selectableItemBackground};
+            TypedArray typedArray = context.obtainStyledAttributes(attrs);
+            int backgroundResource = typedArray.getResourceId(0, 0);
+            holder.parent.setBackgroundResource(backgroundResource);
+            typedArray.recycle();
+            holder.parent.setClickable(true);
         }
     }
 
@@ -60,6 +75,13 @@ public class DrawerRecyclerViewAdapter
         ItemViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
+        }
+
+        @OnClick(R.id.drawer_list_item_parent)
+        void onClick() {
+            recipeIndex = getAdapterPosition();
+            drawerItemClickListener.onDrawerItemClick(recipeIndex);
+            notifyDataSetChanged();
         }
     }
 }

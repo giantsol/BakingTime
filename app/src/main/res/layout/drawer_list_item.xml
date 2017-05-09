@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
-    android:background="?selectableItemBackground">
+    android:background="?attr/selectableItemBackground">
     <ImageView
         android:id="@+id/drawer_list_item_imageview"
         android:layout_width="0dp"

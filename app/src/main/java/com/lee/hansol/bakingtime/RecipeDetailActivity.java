@@ -35,7 +35,8 @@ import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 import static com.lee.hansol.bakingtime.utils.ToastUtils.toast;
 
 public class RecipeDetailActivity extends AppCompatActivity
-        implements StepsRecyclerViewAdapter.OnStepItemClickListener {
+        implements StepsRecyclerViewAdapter.OnStepItemClickListener,
+        DrawerRecyclerViewAdapter.OnDrawerItemClickListener{
     private Recipe[] recipes;
     private int recipeIndex;
     private boolean isTablet;
@@ -91,7 +92,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     private void initializeDrawerView() {
         drawerView.setHasFixedSize(true);
         drawerView.setLayoutManager(new LinearLayoutManager(this));
-        drawerAdapter = new DrawerRecyclerViewAdapter(this, recipes, recipeIndex);
+        drawerAdapter = new DrawerRecyclerViewAdapter(this, recipes, recipeIndex, this);
         drawerView.setAdapter(drawerAdapter);
     }
 
@@ -162,6 +163,12 @@ public class RecipeDetailActivity extends AppCompatActivity
     private void closeSliderFromStepListFragment() {
         if (stepListFragment != null)
             stepListFragment.closeSlider();
+    }
+
+    @Override
+    public void onDrawerItemClick(int recipeIndex) {
+        this.recipeIndex = recipeIndex;
+
     }
 
     @Override
