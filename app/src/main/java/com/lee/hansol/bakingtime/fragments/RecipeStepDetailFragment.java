@@ -1,26 +1,53 @@
 package com.lee.hansol.bakingtime.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.lee.hansol.bakingtime.R;
+import com.lee.hansol.bakingtime.helpers.DataHelper;
 import com.lee.hansol.bakingtime.models.Step;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class RecipeStepDetailFragment extends Fragment {
     private Unbinder unbinder;
-    private Step step;
+    private OnPrevNextButtonClickListener prevNextButtonClickListener;
 
-    public static RecipeStepDetailFragment getInstance(Step step) {
-        RecipeStepDetailFragment fragment = new RecipeStepDetailFragment();
-        fragment.step = step;
-        return fragment;
+    @BindView(R.id.fragment_recipe_step_detail_short_description)
+    TextView shortDescriptionView;
+    @BindView(R.id.fragment_recipe_step_detail_exoplayerview)
+    SimpleExoPlayerView exoPlayerView;
+    @BindView(R.id.fragment_recipe_step_detail_description)
+    TextView descriptionView;
+    @BindView(R.id.fragment_recipe_step_detail_previous_btn)
+    Button previousButton;
+    @BindView(R.id.fragment_recipe_step_detail_next_btn)
+    Button nextButton;
+
+    public interface OnPrevNextButtonClickListener {
+        void onPrevButtonClicked();
+        void onNextButtonClicked();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            prevNextButtonClickListener = (OnPrevNextButtonClickListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnPrevNextButtonClickListener");
+        }
     }
 
     @Nullable
@@ -28,7 +55,24 @@ public class RecipeStepDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipe_step_detail, container, false);
         unbinder = ButterKnife.bind(this, view);
+        initialize();
         return view;
+    }
+
+    private void initialize() {
+        Step step = DataHelper.getInstance().getCurrentStepObject();
+        if (step != null) {
+            shortDescriptionView.setText(step.shortDescription);
+            descriptionView.setText(step.description);
+        }
+    }
+
+    @OnClick({R.id.fragment_recipe_step_detail_previous_btn, R.id.fragment_recipe_step_detail_next_btn})
+    void onButtonClick(View v) {
+        if (v.getId() == R.id.fragment_recipe_step_detail_previous_btn)
+            prevNextButtonClickListener.onPrevButtonClicked();
+        else
+            prevNextButtonClickListener.onNextButtonClicked();
     }
 
     @Override

@@ -25,7 +25,8 @@ import butterknife.ButterKnife;
 
 public class RecipeDetailActivity extends AppCompatActivity
         implements StepsRecyclerViewAdapter.OnStepItemClickListener,
-        DrawerRecyclerViewAdapter.OnDrawerItemClickListener{
+        DrawerRecyclerViewAdapter.OnDrawerItemClickListener,
+        RecipeStepDetailFragment.OnPrevNextButtonClickListener {
     private boolean isTablet;
     private boolean isReplacingFragment;
     private ActionBarDrawerToggle drawerToggle;
@@ -57,6 +58,7 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     private void initializeVariables() {
         actionBar = getSupportActionBar();
+        isTablet = findViewById(R.id.activity_recipe_detail_step_list_fragment_container) != null;
         drawerToggle = new ActionBarDrawerToggle(this, drawer, R.string.content_description_drawer_open, R.string.content_description_drawer_close) {
             private boolean isDrawerDeterminedOpen = false;
 
@@ -138,7 +140,6 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     private void initializeFragmentContainers() {
         stepListFragment = new RecipeStepListFragment();
-        isTablet = findViewById(R.id.activity_recipe_detail_step_list_fragment_container) != null;
         if (isTablet) initializeAsTabletLayout();
         else initializeAsNonTabletLayout();
     }
@@ -214,6 +215,10 @@ public class RecipeDetailActivity extends AppCompatActivity
     @Override
     public void onStepItemClick(int stepIndex) {
         DataHelper.getInstance().setCurrentStepIndex(stepIndex);
+        replaceStepDetailFragment();
+    }
+
+    private void replaceStepDetailFragment() {
         stepDetailFragment = new RecipeStepDetailFragment();
         if (isTablet) {
             fragmentTransaction.replace(R.id.activity_recipe_detail_step_detail_fragment_container, stepDetailFragment)
@@ -224,6 +229,34 @@ public class RecipeDetailActivity extends AppCompatActivity
                     .commit();
         }
         setupFragmentTransaction();
+    }
+
+    @Override
+    public void onPrevButtonClicked() {
+        if (DataHelper.getInstance().hasPreviousStep()) {
+            DataHelper.getInstance().moveToPreviousStep();
+            replaceStepDetailFragment();
+        } else {
+            showTryingToGoPreviousAnimation();
+        }
+    }
+
+    private void showTryingToGoPreviousAnimation() {
+
+    }
+
+    @Override
+    public void onNextButtonClicked() {
+        if (DataHelper.getInstance().hasNextStep()) {
+            DataHelper.getInstance().moveToNextStep();
+            replaceStepDetailFragment();
+        } else {
+            showTryingToGoNextAnimation();
+        }
+    }
+
+    private void showTryingToGoNextAnimation() {
+
     }
 
     @Override

@@ -33,9 +33,9 @@ public class RecipeStepListFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            stepItemClickListener = (StepsRecyclerViewAdapter.OnStepItemClickListener) getActivity();
+            stepItemClickListener = (StepsRecyclerViewAdapter.OnStepItemClickListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(getActivity().toString() + " must implement OnStepItemClickListener");
+            throw new ClassCastException(activity.toString() + " must implement OnStepItemClickListener");
         }
     }
 

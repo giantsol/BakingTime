@@ -28,8 +28,8 @@ public final class DataHelper {
     public void setRecipes(@NonNull Recipe[] recipes) { this.recipes = recipes; }
 
     public void setCurrentRecipeIndex(int index) {
-        if (index >= recipes.length)
-            throw new RuntimeException("invalid index");
+        if (index >= recipes.length || index < 0)
+            throw new RuntimeException("invalid index: " + index);
         currentRecipeIndex = index;
         currentRecipeObject = recipes[currentRecipeIndex];
         ingredients = currentRecipeObject.ingredients;
@@ -38,7 +38,7 @@ public final class DataHelper {
 
     @Nullable
     public Recipe getRecipeObjectAt(int index) {
-        if (index >= recipes.length) return null;
+        if (index >= recipes.length || index < 0) return null;
         else return recipes[index];
     }
 
@@ -52,15 +52,15 @@ public final class DataHelper {
     //Steps
 
     public void setCurrentStepIndex(int index) {
-        if (index >= steps.length)
-            throw new RuntimeException("invalid index");
+        if (index >= steps.length || index < 0)
+            throw new RuntimeException("invalid index: " + index);
         currentStepIndex = index;
         currentStepObject = steps[currentStepIndex];
     }
 
     @Nullable
     public Step getStepObjectAt(int index) {
-        if (index >= steps.length) return null;
+        if (index >= steps.length || index < 0) return null;
         else return steps[index];
     }
 
@@ -71,12 +71,27 @@ public final class DataHelper {
 
     public int getCurrentStepIndex() { return currentStepIndex; }
 
+    public boolean hasNextStep() {
+        return currentStepIndex < steps.length - 1;
+    }
+
+    public boolean hasPreviousStep() {
+        return (steps.length > 0) && (currentStepIndex >= 1);
+    }
+
+    public void moveToNextStep() {
+        setCurrentStepIndex(currentStepIndex + 1);
+    }
+
+    public void moveToPreviousStep() {
+        setCurrentStepIndex(currentStepIndex - 1);
+    }
 
     //Ingredients
 
     @Nullable
     public Ingredient getIngredientObjectAt(int index) {
-        if (index >= ingredients.length) return null;
+        if (index >= ingredients.length || index < 0) return null;
         else return ingredients[index];
     }
 
