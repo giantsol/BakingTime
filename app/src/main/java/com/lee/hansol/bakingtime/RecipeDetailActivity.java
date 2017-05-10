@@ -97,6 +97,10 @@ public class RecipeDetailActivity extends AppCompatActivity
             }
 
         };
+        setupFragmentTransaction();
+    }
+
+    private void setupFragmentTransaction() {
         fragmentTransaction = getFragmentManager().beginTransaction()
                 .setCustomAnimations(R.animator.fragment_slide_left_enter, R.animator.fragment_slide_left_exit,
                         R.animator.fragment_slide_right_enter, R.animator.fragment_lisde_right_exit);
@@ -142,13 +146,13 @@ public class RecipeDetailActivity extends AppCompatActivity
     private void initializeAsTabletLayout() {
         fragmentTransaction.add(R.id.activity_recipe_detail_step_list_fragment_container, stepListFragment)
                 .commit();
-        reloadFragmentTransaction();
+        setupFragmentTransaction();
     }
 
     private void initializeAsNonTabletLayout() {
         fragmentTransaction.add(R.id.activity_recipe_detail_fragment_container, stepListFragment)
                 .commit();
-        reloadFragmentTransaction();
+        setupFragmentTransaction();
     }
 
     @Override
@@ -195,20 +199,15 @@ public class RecipeDetailActivity extends AppCompatActivity
                     .replace(R.id.activity_recipe_detail_fragment_container, stepListFragment)
                     .commit();
 
-        reloadFragmentTransaction();
+        setupFragmentTransaction();
         clearStepDetailFragmentContainerIfTablet();
-    }
-
-    private void reloadFragmentTransaction() {
-        fragmentTransaction = getFragmentManager().beginTransaction()
-                .setCustomAnimations(R.animator.fragment_slide_left_enter, R.animator.fragment_slide_left_exit,
-                        R.animator.fragment_slide_right_enter, R.animator.fragment_lisde_right_exit);
     }
 
     private void clearStepDetailFragmentContainerIfTablet() {
         if (isTablet && (stepDetailFragment != null)) {
             fragmentTransaction.remove(stepDetailFragment).commit();
-            reloadFragmentTransaction();
+            stepDetailFragment = null;
+            setupFragmentTransaction();
         }
     }
 
@@ -224,7 +223,7 @@ public class RecipeDetailActivity extends AppCompatActivity
                     .addToBackStack(null)
                     .commit();
         }
-        reloadFragmentTransaction();
+        setupFragmentTransaction();
     }
 
     @Override

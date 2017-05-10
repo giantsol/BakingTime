@@ -20,7 +20,6 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -36,4 +35,8 @@ dependencies {
     annotationProcessor 'net.simonvt.schematic:schematic-compiler:0.7.0'
 
     compile 'com.sothree.slidinguppanel:library:3.3.1'
+
+//    compile 'com.google.android.exoplayer:exoplayer:r2.4.0'
+    compile 'com.google.android.exoplayer:exoplayer-core:r2.4.0'
+    compile 'com.google.android.exoplayer:exoplayer-ui:r2.4.0'
 }
