@@ -29,6 +29,7 @@ public class RecipeDetailActivity extends AppCompatActivity
         DrawerRecyclerViewAdapter.OnDrawerItemClickListener,
         RecipeStepDetailFragment.OnPrevNextButtonClickListener {
     private boolean isTablet;
+    private boolean isStepDetailShowingInNonTablet;
     private MyDrawerToggle drawerToggle;
     private ActionBar actionBar;
     @Nullable private RecipeStepListFragment stepListFragment;
@@ -110,8 +111,8 @@ public class RecipeDetailActivity extends AppCompatActivity
             drawer.closeDrawer(drawerView);
         else if (isIngredientsSliderOpen())
             closeIngredientsSlider();
-        else if (goBackToStepListFromStepDetail())
-            getFragmentManager().popBackStack("hey", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        else if (isStepDetailShowingInNonTablet)
+            replaceStepDetailFragmentWithStepListFragment();
         else
             super.onBackPressed();
     }
@@ -126,8 +127,15 @@ public class RecipeDetailActivity extends AppCompatActivity
         }
     }
 
-    private boolean goBackToStepListFromStepDetail() {
-        return (!isTablet) && (getFragmentManager().getBackStackEntryCount() >= 1);
+    private void replaceStepDetailFragmentWithStepListFragment() {
+        stepListFragment = new RecipeStepListFragment();
+        getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.animator.fragment_slide_right_enter, R.animator.fragment_slide_right_exit)
+                .replace(R.id.activity_recipe_detail_fragment_container, stepListFragment)
+                .commit();
+        isStepDetailShowingInNonTablet = false;
+        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        drawerToggle.setDrawerIndicatorEnabled(true);
     }
 
     @Override
@@ -248,11 +256,12 @@ public class RecipeDetailActivity extends AppCompatActivity
     private void replaceStepListFragmentWithStepDetailFragment() {
         stepDetailFragment = new RecipeStepDetailFragment();
         getFragmentManager().beginTransaction()
-                .setCustomAnimations(R.animator.fragment_slide_left_enter, R.animator.fragment_slide_left_exit,
-                        R.animator.fragment_slide_right_enter, R.animator.fragment_slide_right_exit)
-                .replace(R.id.activity_recipe_detail_fragment_container, stepDetailFragment, "hey")
-                .addToBackStack("hey")
+                .setCustomAnimations(R.animator.fragment_slide_left_enter, R.animator.fragment_slide_left_exit)
+                .replace(R.id.activity_recipe_detail_fragment_container, stepDetailFragment)
                 .commit();
+        isStepDetailShowingInNonTablet = true;
+        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        drawerToggle.setDrawerIndicatorEnabled(false);
     }
 
     @Override
@@ -275,7 +284,7 @@ public class RecipeDetailActivity extends AppCompatActivity
         else
             getFragmentManager().beginTransaction()
                     .setCustomAnimations(R.animator.fragment_slide_right_enter, R.animator.fragment_slide_right_exit)
-                    .replace(R.id.activity_recipe_detail_fragment_container, stepDetailFragment, "hey")
+                    .replace(R.id.activity_recipe_detail_fragment_container, stepDetailFragment)
                     .commit();
     }
 
@@ -303,7 +312,7 @@ public class RecipeDetailActivity extends AppCompatActivity
         else
             getFragmentManager().beginTransaction()
                     .setCustomAnimations(R.animator.fragment_slide_left_enter, R.animator.fragment_slide_left_exit)
-                    .replace(R.id.activity_recipe_detail_fragment_container, stepDetailFragment, "hey")
+                    .replace(R.id.activity_recipe_detail_fragment_container, stepDetailFragment)
                     .commit();
     }
 
