@@ -17,7 +17,7 @@ import com.lee.hansol.bakingtime.loaders.RecipesLoaderFromDb;
 import com.lee.hansol.bakingtime.loaders.RecipesLoaderFromInternet;
 import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.utils.LogUtils;
-import com.lee.hansol.bakingtime.utils.UserStateUtils;
+import com.lee.hansol.bakingtime.utils.User;
 
 import java.util.Locale;
 
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public Loader<Recipe[]> onCreateLoader(int id, Bundle args) {
-        if (UserStateUtils.hasInternetConnection(this))
+        if (User.hasInternetConnection(this))
             return new RecipesLoaderFromInternet(this);
         else
             return new RecipesLoaderFromDb(this);

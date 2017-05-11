@@ -58,7 +58,6 @@ public class RecipeStepListFragment extends Fragment {
         initializeIngredientsRecyclerView();
         initializeStepsRecyclerView();
         slider.addPanelSlideListener(sliderListener);
-        controlStepListItemClickable();
     }
 
     private void initializeIngredientsRecyclerView() {
@@ -88,11 +87,17 @@ public class RecipeStepListFragment extends Fragment {
         public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState,
                                         SlidingUpPanelLayout.PanelState newState) {
             isSliderOpen = newState == SlidingUpPanelLayout.PanelState.EXPANDED;
-            controlStepListItemClickable();
+            determineStepListItemClickable();
         }
     };
 
-    private void controlStepListItemClickable() {
+    @Override
+    public void onResume() {
+        super.onResume();
+        determineStepListItemClickable();
+    }
+
+    private void determineStepListItemClickable() {
         if (isSliderOpen) {
             disableStepListClick();
         } else {

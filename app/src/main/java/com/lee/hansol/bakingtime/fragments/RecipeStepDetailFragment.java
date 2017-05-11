@@ -69,6 +69,7 @@ public class RecipeStepDetailFragment extends Fragment {
         Step step = DataHelper.getInstance().getCurrentStepObject();
         if (step != null) {
             shortDescriptionView.setText(step.shortDescription);
+            //TODO: add video
             descriptionView.setText(step.description);
         }
     }
