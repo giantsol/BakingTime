@@ -127,6 +127,30 @@ public class RecipeStepDetailFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (exoPlayer != null) exoPlayer.release();
+        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTrackSelectionFactory =
+                new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelector trackSelector =
+                new DefaultTrackSelector(videoTrackSelectionFactory);
+
+        exoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
+        exoPlayerView.setPlayer(exoPlayer);
+        exoPlayer.setPlayWhenReady(shouldAutoPlay);
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getActivity(),
+                Util.getUserAgent(getActivity(), "BakingTime"));
+        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+        Step step = DataHelper.getInstance().getCurrentStepObject();
+        MediaSource videoSource = new ExtractorMediaSource(Uri.parse(step.videoUrlString),
+                dataSourceFactory, extractorsFactory, null, null);
+        boolean haveResumePosition = resumeWindow != C.INDEX_UNSET;
+        if (haveResumePosition) exoPlayer.seekTo(resumeWindow, resumePosition);
+        exoPlayer.prepare(videoSource, !haveResumePosition, false);
+    }
+
     @OnClick({R.id.fragment_recipe_step_detail_previous_btn, R.id.fragment_recipe_step_detail_next_btn})
     void onButtonClick(View v) {
         if (v.getId() == R.id.fragment_recipe_step_detail_previous_btn)
