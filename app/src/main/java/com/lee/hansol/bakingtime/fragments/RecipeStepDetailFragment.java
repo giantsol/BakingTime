@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -89,12 +90,14 @@ public class RecipeStepDetailFragment extends Fragment {
     }
 
     public void slideLeftRenewSlideRightEnter() {
-        final Animator slideLeft = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_left_exit);
+        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        Animator slideLeft = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_left_exit);
         slideLeft.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 initialize();
-                slideLeft.removeAllListeners();
+                animation.removeAllListeners();
                 slideRightEnter();
             }
         });
@@ -104,17 +107,26 @@ public class RecipeStepDetailFragment extends Fragment {
 
     private void slideRightEnter() {
         Animator slideRightEnter = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_right_enter);
+        slideRightEnter.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                animation.removeAllListeners();
+            }
+        });
         slideRightEnter.setTarget(rootView);
         slideRightEnter.start();
     }
 
     public void slideRightRenewSlideRightEnter() {
-        final Animator slideRight = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_right_exit);
+        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        Animator slideRight = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_right_exit);
         slideRight.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 initialize();
-                slideRight.removeAllListeners();
+                animation.removeAllListeners();
                 slideRightEnter();
             }
         });
@@ -123,12 +135,14 @@ public class RecipeStepDetailFragment extends Fragment {
     }
 
     public void slideLeftRenewSlideLeftEnter() {
-        final Animator slideLeft = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_left_exit);
+        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        Animator slideLeft = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_left_exit);
         slideLeft.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 initialize();
-                slideLeft.removeAllListeners();
+                animation.removeAllListeners();
                 slideLeftEnter();
             }
         });
@@ -138,6 +152,13 @@ public class RecipeStepDetailFragment extends Fragment {
 
     private void slideLeftEnter() {
         Animator slideLeftEnter = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_left_enter);
+        slideLeftEnter.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                animation.removeAllListeners();
+            }
+        });
         slideLeftEnter.setTarget(rootView);
         slideLeftEnter.start();
     }

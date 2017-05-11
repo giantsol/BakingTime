@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.adapters.IngredientsRecyclerViewAdapter;
@@ -21,6 +22,8 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
+import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 public class RecipeStepListFragment extends Fragment {
     private Unbinder unbinder;
@@ -124,12 +127,14 @@ public class RecipeStepListFragment extends Fragment {
     }
 
     public void fadeOutRenewFadeIn() {
-        final Animator fadeOut = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_fade_out);
+        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        Animator fadeOut = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_fade_out);
         fadeOut.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 initialize(null);
-                fadeOut.removeAllListeners();
+                animation.removeAllListeners();
                 fadeIn();
             }
         });
@@ -139,6 +144,13 @@ public class RecipeStepListFragment extends Fragment {
 
     private void fadeIn() {
         Animator fadeIn = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_fade_in);
+        fadeIn.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                animation.removeAllListeners();
+            }
+        });
         fadeIn.setTarget(rootView);
         fadeIn.start();
     }
