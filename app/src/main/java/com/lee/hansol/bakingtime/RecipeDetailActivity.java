@@ -25,15 +25,19 @@ import com.lee.hansol.bakingtime.models.Recipe;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+
 public class RecipeDetailActivity extends AppCompatActivity
         implements StepsRecyclerViewAdapter.OnStepItemClickListener,
         DrawerRecyclerViewAdapter.OnDrawerItemClickListener,
         RecipeStepDetailFragment.OnPrevNextButtonClickListener {
     private boolean isTablet;
+    private boolean isStepDetailFragmentVisible;
     private MyDrawerToggle drawerToggle;
     private ActionBar actionBar;
     @NonNull private RecipeStepListFragment stepListFragment = new RecipeStepListFragment();
     @NonNull private RecipeStepDetailFragment stepDetailFragment = new RecipeStepDetailFragment();
+    private final String SAVED_BUNDLE_IS_TABLET_KEY = "is_tablet";
+    private final String SAVED_BUNDLE_IS_STEP_DETAIL_FRAGMENT_VISIBLE_KEY = "step_detail_visible";
 
     @BindView(R.id.activity_recipe_detail_navigation_drawer) DrawerLayout drawer;
     @BindView(R.id.activity_recipe_detail_navigation_drawer_view) RecyclerView drawerView;
@@ -47,21 +51,33 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void initialize(Bundle savedInstanceState) {
-        initializeVariables();
-        setActionBarTitleToCurrentRecipe();
+        initializeVariables(savedInstanceState);
+        initializeActionBar();
         initializeDrawer();
 
         if (savedInstanceState == null)
             initializeFragmentContainers();
-        else
-            getFragmentsFromContainers();
     }
 
-    private void initializeVariables() {
+    private void initializeVariables(Bundle savedInstanceState) {
         actionBar = getSupportActionBar();
-        isTablet = findViewById(R.id.activity_recipe_detail_step_list_fragment_container) != null;
         drawerToggle = new MyDrawerToggle(this, drawer, R.string.content_description_drawer_open,
                 R.string.content_description_drawer_close);
+        if (savedInstanceState != null) {
+            isTablet = savedInstanceState.getBoolean(SAVED_BUNDLE_IS_TABLET_KEY,
+                    findViewById(R.id.activity_recipe_detail_step_list_fragment_container) != null);
+            isStepDetailFragmentVisible = savedInstanceState.getBoolean(SAVED_BUNDLE_IS_STEP_DETAIL_FRAGMENT_VISIBLE_KEY,
+                    false);
+            getFragmentsFromContainers();
+        } else {
+            isTablet = findViewById(R.id.activity_recipe_detail_step_list_fragment_container) != null;
+            stepListFragment = new RecipeStepListFragment();
+            stepDetailFragment = new RecipeStepDetailFragment();
+        }
+    }
+
+    private void initializeActionBar() {
+        setActionBarTitleToCurrentRecipe();
     }
 
     private void setActionBarTitleToCurrentRecipe() {
@@ -74,6 +90,16 @@ public class RecipeDetailActivity extends AppCompatActivity
         setupActionBar();
         drawer.addDrawerListener(drawerToggle);
         initializeDrawerView();
+        if (!isTablet && isStepDetailFragmentVisible) {
+            drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            drawerToggle.setDrawerIndicatorEnabled(false);
+//            drawerToggle.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
+////            actionBar.setDisplayHomeAsUpEnabled(true);
+////            actionBar.setHomeButtonEnabled(true);
+        } else {
+            drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            drawerToggle.setDrawerIndicatorEnabled(true);
+        }
     }
 
     private void setupActionBar() {
@@ -125,8 +151,9 @@ public class RecipeDetailActivity extends AppCompatActivity
             drawer.closeDrawer(drawerView);
         else if (isIngredientsSliderOpen())
             closeIngredientsSlider();
-        else if (!isTablet && stepDetailFragment.isVisible())
+        else if (!isTablet && isStepDetailFragmentVisible) {
             replaceStepDetailFragmentWithStepListFragment();
+        }
         else
             super.onBackPressed();
     }
@@ -146,6 +173,7 @@ public class RecipeDetailActivity extends AppCompatActivity
                 .commit();
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         drawerToggle.setDrawerIndicatorEnabled(true);
+        isStepDetailFragmentVisible = false;
     }
 
     @Override
@@ -224,10 +252,11 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void clearStepDetailFragmentContainerIfTablet() {
-        if (isTablet && stepDetailFragment.isVisible()) {
+        if (isTablet && isStepDetailFragmentVisible) {
             getFragmentManager().beginTransaction().
                     setCustomAnimations(0, R.animator.fragment_fade_out)
                     .remove(stepDetailFragment).commit();
+            isStepDetailFragmentVisible = false;
         }
     }
 
@@ -245,7 +274,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void showStepDetailFragmentInRightPanel() {
-        if (stepDetailFragment.isVisible()) {
+        if (isStepDetailFragmentVisible) {
             stepDetailFragment.slideLeftRenewSlideRightEnter();
         }
         else
@@ -253,6 +282,7 @@ public class RecipeDetailActivity extends AppCompatActivity
                     .setCustomAnimations(R.animator.fragment_slide_right_enter, 0)
                     .add(R.id.activity_recipe_detail_step_detail_fragment_container, stepDetailFragment)
                     .commit();
+        isStepDetailFragmentVisible = true;
     }
 
     private void replaceStepListFragmentWithStepDetailFragment() {
@@ -262,6 +292,7 @@ public class RecipeDetailActivity extends AppCompatActivity
                 .commit();
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         drawerToggle.setDrawerIndicatorEnabled(false);
+        isStepDetailFragmentVisible = true;
     }
 
     @Override
@@ -309,4 +340,10 @@ public class RecipeDetailActivity extends AppCompatActivity
         return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(SAVED_BUNDLE_IS_TABLET_KEY, isTablet);
+        outState.putBoolean(SAVED_BUNDLE_IS_STEP_DETAIL_FRAGMENT_VISIBLE_KEY, isStepDetailFragmentVisible);
+        super.onSaveInstanceState(outState);
+    }
 }

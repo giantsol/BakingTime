@@ -27,6 +27,7 @@ public class RecipeStepListFragment extends Fragment {
     private StepsRecyclerViewAdapter.OnStepItemClickListener stepItemClickListener;
     private View rootView;
     public boolean isSliderOpen = false;
+    private final String SAVED_BUNDLE_IS_SLIDER_OPEN_KEY = "is_slider_open";
 
     @BindView(R.id.fragment_recipe_step_list_ingredients_view) RecyclerView ingredientsRecyclerView;
     @BindView(R.id.fragment_recipe_step_list_steps_view) RecyclerView stepsRecyclerView;
@@ -47,14 +48,17 @@ public class RecipeStepListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_recipe_step_list, container, false);
         unbinder = ButterKnife.bind(this, rootView);
-        initialize();
+        initialize(savedInstanceState);
         return rootView;
     }
 
-    private void initialize() {
+    private void initialize(Bundle savedInstanceState) {
+        if (savedInstanceState != null)
+            isSliderOpen = savedInstanceState.getBoolean(SAVED_BUNDLE_IS_SLIDER_OPEN_KEY, false);
         initializeIngredientsRecyclerView();
         initializeStepsRecyclerView();
         slider.addPanelSlideListener(sliderListener);
+        controlStepListItemClickable();
     }
 
     private void initializeIngredientsRecyclerView() {
@@ -84,13 +88,17 @@ public class RecipeStepListFragment extends Fragment {
         public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState,
                                         SlidingUpPanelLayout.PanelState newState) {
             isSliderOpen = newState == SlidingUpPanelLayout.PanelState.EXPANDED;
-            if (isSliderOpen) {
-                disableStepListClick();
-            } else {
-                enableStepListClick();
-            }
+            controlStepListItemClickable();
         }
     };
+
+    private void controlStepListItemClickable() {
+        if (isSliderOpen) {
+            disableStepListClick();
+        } else {
+            enableStepListClick();
+        }
+    }
 
     private void disableStepListClick() {
         transparentScreen.setVisibility(View.VISIBLE);
@@ -115,7 +123,7 @@ public class RecipeStepListFragment extends Fragment {
         fadeOut.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                initialize();
+                initialize(null);
                 fadeOut.removeAllListeners();
                 fadeIn();
             }
@@ -128,5 +136,10 @@ public class RecipeStepListFragment extends Fragment {
         Animator fadeIn = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_fade_in);
         fadeIn.setTarget(rootView);
         fadeIn.start();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(SAVED_BUNDLE_IS_SLIDER_OPEN_KEY, isSliderOpen);
     }
 }
