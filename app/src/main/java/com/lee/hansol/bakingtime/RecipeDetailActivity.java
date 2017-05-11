@@ -305,6 +305,7 @@ public class RecipeDetailActivity extends AppCompatActivity
         } else {
             showTryingToGoPreviousAnimation();
         }
+
     }
 
     private void showTryingToGoPreviousAnimation() {
