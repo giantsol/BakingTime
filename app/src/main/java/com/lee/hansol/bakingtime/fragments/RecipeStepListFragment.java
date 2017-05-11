@@ -1,5 +1,8 @@
 package com.lee.hansol.bakingtime.fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -22,6 +25,7 @@ import butterknife.Unbinder;
 public class RecipeStepListFragment extends Fragment {
     private Unbinder unbinder;
     private StepsRecyclerViewAdapter.OnStepItemClickListener stepItemClickListener;
+    private View rootView;
     public boolean isSliderOpen = false;
 
     @BindView(R.id.fragment_recipe_step_list_ingredients_view) RecyclerView ingredientsRecyclerView;
@@ -41,10 +45,10 @@ public class RecipeStepListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_recipe_step_list, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        rootView = inflater.inflate(R.layout.fragment_recipe_step_list, container, false);
+        unbinder = ButterKnife.bind(this, rootView);
         initialize();
-        return view;
+        return rootView;
     }
 
     private void initialize() {
@@ -104,5 +108,25 @@ public class RecipeStepListFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    public void fadeOutRenewFadeIn() {
+        final Animator fadeOut = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_fade_out);
+        fadeOut.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                initialize();
+                fadeOut.removeAllListeners();
+                fadeIn();
+            }
+        });
+        fadeOut.setTarget(rootView);
+        fadeOut.start();
+    }
+
+    private void fadeIn() {
+        Animator fadeIn = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_fade_in);
+        fadeIn.setTarget(rootView);
+        fadeIn.start();
     }
 }

@@ -1,5 +1,10 @@
 package com.lee.hansol.bakingtime.fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -23,6 +28,7 @@ import butterknife.Unbinder;
 public class RecipeStepDetailFragment extends Fragment {
     private Unbinder unbinder;
     private OnPrevNextButtonClickListener prevNextButtonClickListener;
+    private View rootView;
 
     @BindView(R.id.fragment_recipe_step_detail_short_description)
     TextView shortDescriptionView;
@@ -53,10 +59,10 @@ public class RecipeStepDetailFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_recipe_step_detail, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        rootView = inflater.inflate(R.layout.fragment_recipe_step_detail, container, false);
+        unbinder = ButterKnife.bind(this, rootView);
         initialize();
-        return view;
+        return rootView;
     }
 
     private void initialize() {
@@ -79,5 +85,59 @@ public class RecipeStepDetailFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    public void slideLeftRenewSlideRightEnter() {
+        final Animator slideLeft = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_left_exit);
+        slideLeft.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                initialize();
+                slideLeft.removeAllListeners();
+                slideRightEnter();
+            }
+        });
+        slideLeft.setTarget(rootView);
+        slideLeft.start();
+    }
+
+    private void slideRightEnter() {
+        Animator slideRightEnter = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_right_enter);
+        slideRightEnter.setTarget(rootView);
+        slideRightEnter.start();
+    }
+
+    public void slideRightRenewSlideRightEnter() {
+        final Animator slideRight = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_right_exit);
+        slideRight.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                initialize();
+                slideRight.removeAllListeners();
+                slideRightEnter();
+            }
+        });
+        slideRight.setTarget(rootView);
+        slideRight.start();
+    }
+
+    public void slideLeftRenewSlideLeftEnter() {
+        final Animator slideLeft = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_left_exit);
+        slideLeft.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                initialize();
+                slideLeft.removeAllListeners();
+                slideLeftEnter();
+            }
+        });
+        slideLeft.setTarget(rootView);
+        slideLeft.start();
+    }
+
+    private void slideLeftEnter() {
+        Animator slideLeftEnter = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_left_enter);
+        slideLeftEnter.setTarget(rootView);
+        slideLeftEnter.start();
     }
 }

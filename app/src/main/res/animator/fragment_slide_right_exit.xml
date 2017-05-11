@@ -4,5 +4,5 @@
         android:valueFrom="0dp" android:valueTo="800dp"
         android:valueType="floatType"
         android:propertyName="translationX"
-        android:duration="@android:integer/config_mediumAnimTime" />
+        android:duration="100" />
 </set>
