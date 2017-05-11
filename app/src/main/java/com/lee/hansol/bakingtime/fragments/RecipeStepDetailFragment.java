@@ -7,7 +7,9 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Fragment;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +18,22 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.ExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.helpers.DataHelper;
 import com.lee.hansol.bakingtime.models.Step;
@@ -26,10 +43,14 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
+import static com.lee.hansol.bakingtime.utils.LogUtils.context;
+import static com.lee.hansol.bakingtime.utils.LogUtils.log;
+
 public class RecipeStepDetailFragment extends Fragment {
     private Unbinder unbinder;
     private OnPrevNextButtonClickListener prevNextButtonClickListener;
     private View rootView;
+    private SimpleExoPlayer exoPlayer;
 
     @BindView(R.id.fragment_recipe_step_detail_short_description)
     TextView shortDescriptionView;
@@ -70,8 +91,23 @@ public class RecipeStepDetailFragment extends Fragment {
         Step step = DataHelper.getInstance().getCurrentStepObject();
         if (step != null) {
             shortDescriptionView.setText(step.shortDescription);
-            //TODO: add video
             descriptionView.setText(step.description);
+
+            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+            TrackSelection.Factory videoTrackSelectionFactory =
+                    new AdaptiveTrackSelection.Factory(bandwidthMeter);
+            TrackSelector trackSelector =
+                    new DefaultTrackSelector(videoTrackSelectionFactory);
+
+            exoPlayer =
+                    ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
+            exoPlayerView.setPlayer(exoPlayer);
+            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getActivity(),
+                    Util.getUserAgent(getActivity(), "BakingTime"));
+            ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+            MediaSource videoSource = new ExtractorMediaSource(Uri.parse(step.videoUrlString),
+                    dataSourceFactory, extractorsFactory, null, null);
+            exoPlayer.prepare(videoSource);
         }
     }
 
@@ -81,6 +117,12 @@ public class RecipeStepDetailFragment extends Fragment {
             prevNextButtonClickListener.onPrevButtonClicked();
         else
             prevNextButtonClickListener.onNextButtonClicked();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        exoPlayer.release();
     }
 
     @Override
