@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
@@ -52,6 +53,7 @@ public class RecipeStepDetailFragment extends Fragment {
     private OnPrevNextButtonClickListener prevNextButtonClickListener;
     private View rootView;
     private SimpleExoPlayer exoPlayer;
+    private MediaSource videoSource;
 
     @BindView(R.id.fragment_recipe_step_detail_short_description)
     TextView shortDescriptionView;
@@ -95,22 +97,34 @@ public class RecipeStepDetailFragment extends Fragment {
             descriptionView.setText(step.description);
 
             if (exoPlayer != null) exoPlayer.release();
-            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            TrackSelection.Factory videoTrackSelectionFactory =
-                    new AdaptiveTrackSelection.Factory(bandwidthMeter);
-            TrackSelector trackSelector =
-                    new DefaultTrackSelector(videoTrackSelectionFactory);
+            initializeExoPlayer();
 
-            exoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
             exoPlayerView.setPlayer(exoPlayer);
-            exoPlayer.setPlayWhenReady(true);
             DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getActivity(),
                     Util.getUserAgent(getActivity(), "BakingTime"));
             ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-            MediaSource videoSource = new ExtractorMediaSource(Uri.parse(step.videoUrlString),
+            videoSource = new ExtractorMediaSource(Uri.parse(step.videoUrlString),
                     dataSourceFactory, extractorsFactory, null, null);
             exoPlayer.prepare(videoSource);
         }
+    }
+
+    private void initializeExoPlayer() {
+        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTrackSelectionFactory =
+                new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelector trackSelector =
+                new DefaultTrackSelector(videoTrackSelectionFactory);
+
+        exoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
+        exoPlayer.setPlayWhenReady(true);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (exoPlayer.getPlaybackState() == ExoPlayer.STATE_READY)
+            exoPlayer.setPlayWhenReady(false);
     }
 
     @OnClick({R.id.fragment_recipe_step_detail_previous_btn, R.id.fragment_recipe_step_detail_next_btn})
@@ -200,5 +214,4 @@ public class RecipeStepDetailFragment extends Fragment {
         slideLeftEnter.setTarget(rootView);
         slideLeftEnter.start();
     }
-
 }
