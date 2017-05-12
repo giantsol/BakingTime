@@ -65,12 +65,7 @@ public class RecipeStepListFragment extends Fragment {
 
     private void initializeIngredientsRecyclerView() {
         ingredientsRecyclerView.setHasFixedSize(true);
-        ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()) {
-            @Override
-            public boolean canScrollVertically() {
-                return false;
-            }
-        });
+        ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         ingredientsRecyclerView.setAdapter(new IngredientsRecyclerViewAdapter());
     }
 
