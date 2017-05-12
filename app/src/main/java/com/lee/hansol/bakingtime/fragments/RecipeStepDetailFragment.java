@@ -3,13 +3,10 @@ package com.lee.hansol.bakingtime.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -20,7 +17,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -41,20 +37,18 @@ import com.google.android.exoplayer2.util.Util;
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.helpers.DataHelper;
 import com.lee.hansol.bakingtime.models.Step;
+import com.lee.hansol.bakingtime.utils.User;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-import static com.lee.hansol.bakingtime.utils.LogUtils.context;
-import static com.lee.hansol.bakingtime.utils.LogUtils.log;
-
 public class RecipeStepDetailFragment extends Fragment {
     private Unbinder unbinder;
     private OnPrevNextButtonClickListener prevNextButtonClickListener;
     private View rootView;
-    private SimpleExoPlayer exoPlayer;
+    @Nullable private SimpleExoPlayer exoPlayer;
 
     @BindView(R.id.fragment_recipe_step_detail_short_description)
     TextView shortDescriptionView;
@@ -105,13 +99,29 @@ public class RecipeStepDetailFragment extends Fragment {
 
     private void setExoPlayerView(String videoUrlString) {
         if (exoPlayer != null) exoPlayer.release();
-        if ((videoUrlString != null) && (videoUrlString.length() > 0)) {
-            showExoPlayerView(videoUrlString);
-        } else {
+        if ((videoUrlString == null) || (videoUrlString.length() == 0)) {
             showVideoEmptyView();
+        } else if (!User.hasInternetConnection(getActivity())) {
+            showVideoUnplayableView();
+        } else {
+            showExoPlayerView(videoUrlString);
         }
     }
 
+    private void showVideoEmptyView() {
+        brokenVideoImage.setVisibility(View.VISIBLE);
+        brokenVideoText.setVisibility(View.VISIBLE);
+        brokenVideoText.setText(getString(R.string.text_broken_video));
+        exoPlayerView.setVisibility(View.GONE);
+    }
+
+    private void showVideoUnplayableView() {
+        brokenVideoImage.setVisibility(View.VISIBLE);
+        brokenVideoText.setVisibility(View.VISIBLE);
+        brokenVideoText.setText(getString(R.string.text_no_internet));
+        exoPlayerView.setVisibility(View.GONE);
+
+    }
     private void showExoPlayerView(@NonNull String videoUrlString) {
         initializeExoPlayer();
 
@@ -127,11 +137,6 @@ public class RecipeStepDetailFragment extends Fragment {
         exoPlayerView.setVisibility(View.VISIBLE);
     }
 
-    private void showVideoEmptyView() {
-        brokenVideoImage.setVisibility(View.VISIBLE);
-        brokenVideoText.setVisibility(View.VISIBLE);
-        exoPlayerView.setVisibility(View.GONE);
-    }
 
     private void initializeExoPlayer() {
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
@@ -147,7 +152,7 @@ public class RecipeStepDetailFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        if (exoPlayer.getPlaybackState() == ExoPlayer.STATE_READY)
+        if ((exoPlayer != null) && (exoPlayer.getPlaybackState() == ExoPlayer.STATE_READY))
             exoPlayer.setPlayWhenReady(false);
     }
 

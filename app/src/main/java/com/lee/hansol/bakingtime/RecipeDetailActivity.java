@@ -314,7 +314,11 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
+        int id = item.getItemId();
+        if (id == android.R.id.home && !drawerToggle.isDrawerIndicatorEnabled()) {
+            replaceStepDetailFragmentWithStepListFragment();
+            return true;
+        } else
+            return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
-
 }
