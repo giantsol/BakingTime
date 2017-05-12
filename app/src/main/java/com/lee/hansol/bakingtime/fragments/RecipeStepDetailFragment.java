@@ -10,12 +10,14 @@ import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.C;
@@ -53,7 +55,6 @@ public class RecipeStepDetailFragment extends Fragment {
     private OnPrevNextButtonClickListener prevNextButtonClickListener;
     private View rootView;
     private SimpleExoPlayer exoPlayer;
-    private MediaSource videoSource;
 
     @BindView(R.id.fragment_recipe_step_detail_short_description)
     TextView shortDescriptionView;
@@ -65,6 +66,9 @@ public class RecipeStepDetailFragment extends Fragment {
     Button previousButton;
     @BindView(R.id.fragment_recipe_step_detail_next_btn)
     Button nextButton;
+    @BindView(R.id.fragment_recipe_step_detail_broken_video_image)
+    ImageView brokenVideoImage;
+    @BindView(R.id.fragment_recipe_step_detail_broken_video_text) TextView brokenVideoText;
 
     public interface OnPrevNextButtonClickListener {
         void onPrevButtonClicked();
@@ -95,18 +99,38 @@ public class RecipeStepDetailFragment extends Fragment {
         if (step != null) {
             shortDescriptionView.setText(step.shortDescription);
             descriptionView.setText(step.description);
-
-            if (exoPlayer != null) exoPlayer.release();
-            initializeExoPlayer();
-
-            exoPlayerView.setPlayer(exoPlayer);
-            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getActivity(),
-                    Util.getUserAgent(getActivity(), "BakingTime"));
-            ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-            videoSource = new ExtractorMediaSource(Uri.parse(step.videoUrlString),
-                    dataSourceFactory, extractorsFactory, null, null);
-            exoPlayer.prepare(videoSource);
+            setExoPlayerView(step.videoUrlString);
         }
+    }
+
+    private void setExoPlayerView(String videoUrlString) {
+        if (exoPlayer != null) exoPlayer.release();
+        if ((videoUrlString != null) && (videoUrlString.length() > 0)) {
+            showExoPlayerView(videoUrlString);
+        } else {
+            showVideoEmptyView();
+        }
+    }
+
+    private void showExoPlayerView(@NonNull String videoUrlString) {
+        initializeExoPlayer();
+
+        exoPlayerView.setPlayer(exoPlayer);
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getActivity(),
+                Util.getUserAgent(getActivity(), "BakingTime"));
+        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+        MediaSource videoSource = new ExtractorMediaSource(Uri.parse(videoUrlString),
+                dataSourceFactory, extractorsFactory, null, null);
+        exoPlayer.prepare(videoSource);
+        brokenVideoImage.setVisibility(View.GONE);
+        brokenVideoText.setVisibility(View.GONE);
+        exoPlayerView.setVisibility(View.VISIBLE);
+    }
+
+    private void showVideoEmptyView() {
+        brokenVideoImage.setVisibility(View.VISIBLE);
+        brokenVideoText.setVisibility(View.VISIBLE);
+        exoPlayerView.setVisibility(View.GONE);
     }
 
     private void initializeExoPlayer() {

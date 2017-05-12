@@ -21,19 +21,38 @@
             android:textSize="@dimen/textsize_bigger"
             android:gravity="center"
             tools:text="short description"/>
-        <com.google.android.exoplayer2.ui.SimpleExoPlayerView
-            android:id="@+id/fragment_recipe_step_detail_exoplayerview"
+        <FrameLayout
+            android:id="@+id/fragment_recipe_step_detail_exoplayerview_container"
             android:layout_width="0dp"
-            android:layout_height="300dp"
+            android:layout_height="@dimen/video_height"
             app:layout_constraintTop_toBottomOf="@+id/fragment_recipe_step_detail_short_description"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginTop="@dimen/spacing_big"/>
+            android:layout_marginTop="@dimen/spacing_big">
+            <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+                android:id="@+id/fragment_recipe_step_detail_exoplayerview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+            <ImageView
+                android:id="@+id/fragment_recipe_step_detail_broken_video_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_broken_image_black_24dp"
+                android:visibility="gone"/>
+            <TextView
+                android:id="@+id/fragment_recipe_step_detail_broken_video_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/text_broken_video"
+                android:visibility="gone"/>
+        </FrameLayout>
         <TextView
             android:id="@+id/fragment_recipe_step_detail_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/fragment_recipe_step_detail_exoplayerview"
+            app:layout_constraintTop_toBottomOf="@id/fragment_recipe_step_detail_exoplayerview_container"
             app:layout_constraintRight_toLeftOf="parent"
             app:layout_constraintLeft_toRightOf="parent"
             android:layout_marginTop="@dimen/spacing_big"
@@ -42,6 +61,7 @@
             android:id="@+id/fragment_recipe_step_detail_previous_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/fragment_recipe_step_detail_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             android:layout_marginBottom="@dimen/spacing_normal"
@@ -53,6 +73,7 @@
             android:id="@+id/fragment_recipe_step_detail_next_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/fragment_recipe_step_detail_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginBottom="@dimen/spacing_normal"
