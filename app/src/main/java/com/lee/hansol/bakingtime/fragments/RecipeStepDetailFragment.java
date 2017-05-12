@@ -156,6 +156,7 @@ public class RecipeStepDetailFragment extends Fragment {
             exoPlayer.setPlayWhenReady(false);
     }
 
+
     @OnClick({R.id.fragment_recipe_step_detail_previous_btn, R.id.fragment_recipe_step_detail_next_btn})
     void onButtonClick(View v) {
         if (v.getId() == R.id.fragment_recipe_step_detail_previous_btn)
@@ -168,6 +169,7 @@ public class RecipeStepDetailFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        if (exoPlayer != null) exoPlayer.release();
     }
 
     public void slideLeftRenewSlideRightEnter() {
