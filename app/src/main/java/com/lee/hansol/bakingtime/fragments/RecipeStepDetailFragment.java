@@ -52,9 +52,6 @@ public class RecipeStepDetailFragment extends Fragment {
     private OnPrevNextButtonClickListener prevNextButtonClickListener;
     private View rootView;
     private SimpleExoPlayer exoPlayer;
-    private boolean shouldAutoPlay;
-    private int resumeWindow;
-    private long resumePosition;
 
     @BindView(R.id.fragment_recipe_step_detail_short_description)
     TextView shortDescriptionView;
@@ -87,25 +84,16 @@ public class RecipeStepDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_recipe_step_detail, container, false);
         unbinder = ButterKnife.bind(this, rootView);
-        initialize(savedInstanceState);
+        initialize();
         return rootView;
     }
 
-    private void initialize(Bundle savedInstanceState) {
+    private void initialize() {
         Step step = DataHelper.getInstance().getCurrentStepObject();
         if (step != null) {
             shortDescriptionView.setText(step.shortDescription);
             descriptionView.setText(step.description);
 
-            if (savedInstanceState != null) {
-                resumeWindow = savedInstanceState.getInt("resumeWindow");
-                resumePosition = savedInstanceState.getLong("resumePosition");
-                shouldAutoPlay = savedInstanceState.getBoolean("shouldAutoPlay");
-            } else {
-                resumeWindow = C.INDEX_UNSET;
-                resumePosition = C.TIME_UNSET;
-                shouldAutoPlay = true;
-            }
             if (exoPlayer != null) exoPlayer.release();
             BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
             TrackSelection.Factory videoTrackSelectionFactory =
@@ -115,40 +103,14 @@ public class RecipeStepDetailFragment extends Fragment {
 
             exoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
             exoPlayerView.setPlayer(exoPlayer);
-            exoPlayer.setPlayWhenReady(shouldAutoPlay);
+            exoPlayer.setPlayWhenReady(true);
             DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getActivity(),
                     Util.getUserAgent(getActivity(), "BakingTime"));
             ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
             MediaSource videoSource = new ExtractorMediaSource(Uri.parse(step.videoUrlString),
                     dataSourceFactory, extractorsFactory, null, null);
-            boolean haveResumePosition = resumeWindow != C.INDEX_UNSET;
-            if (haveResumePosition) exoPlayer.seekTo(resumeWindow, resumePosition);
-            exoPlayer.prepare(videoSource, !haveResumePosition, false);
+            exoPlayer.prepare(videoSource);
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (exoPlayer != null) exoPlayer.release();
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTrackSelectionFactory =
-                new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector =
-                new DefaultTrackSelector(videoTrackSelectionFactory);
-
-        exoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
-        exoPlayerView.setPlayer(exoPlayer);
-        exoPlayer.setPlayWhenReady(shouldAutoPlay);
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getActivity(),
-                Util.getUserAgent(getActivity(), "BakingTime"));
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-        Step step = DataHelper.getInstance().getCurrentStepObject();
-        MediaSource videoSource = new ExtractorMediaSource(Uri.parse(step.videoUrlString),
-                dataSourceFactory, extractorsFactory, null, null);
-        boolean haveResumePosition = resumeWindow != C.INDEX_UNSET;
-        if (haveResumePosition) exoPlayer.seekTo(resumeWindow, resumePosition);
-        exoPlayer.prepare(videoSource, !haveResumePosition, false);
     }
 
     @OnClick({R.id.fragment_recipe_step_detail_previous_btn, R.id.fragment_recipe_step_detail_next_btn})
@@ -172,7 +134,7 @@ public class RecipeStepDetailFragment extends Fragment {
         slideLeft.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                initialize(null);
+                initialize();
                 animation.removeAllListeners();
                 slideRightEnter();
             }
@@ -201,7 +163,7 @@ public class RecipeStepDetailFragment extends Fragment {
         slideRight.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                initialize(null);
+                initialize();
                 animation.removeAllListeners();
                 slideRightEnter();
             }
@@ -217,7 +179,7 @@ public class RecipeStepDetailFragment extends Fragment {
         slideLeft.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                initialize(null);
+                initialize();
                 animation.removeAllListeners();
                 slideLeftEnter();
             }
@@ -239,15 +201,4 @@ public class RecipeStepDetailFragment extends Fragment {
         slideLeftEnter.start();
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        int resumeWindow = exoPlayer.getCurrentWindowIndex();
-        long resumePosition = exoPlayer.isCurrentWindowSeekable() ? Math.max(0, exoPlayer.getCurrentPosition())
-                : C.TIME_UNSET;
-        boolean shouldAutoPlay = exoPlayer.getPlayWhenReady();
-        outState.putInt("resumeWindow", resumeWindow);
-        outState.putLong("resumePosition", resumePosition);
-        outState.putBoolean("shouldAutoPlay", shouldAutoPlay);
-        exoPlayer.release();
-    }
 }

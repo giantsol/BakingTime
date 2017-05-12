@@ -30,7 +30,7 @@ public class RecipeStepListFragment extends Fragment {
     private StepsRecyclerViewAdapter.OnStepItemClickListener stepItemClickListener;
     private View rootView;
     public boolean isSliderOpen = false;
-    private final String SAVED_BUNDLE_IS_SLIDER_OPEN_KEY = "is_slider_open";
+//    private final String SAVED_BUNDLE_IS_SLIDER_OPEN_KEY = "is_slider_open";
 
     @BindView(R.id.fragment_recipe_step_list_ingredients_view) RecyclerView ingredientsRecyclerView;
     @BindView(R.id.fragment_recipe_step_list_steps_view) RecyclerView stepsRecyclerView;
@@ -56,8 +56,8 @@ public class RecipeStepListFragment extends Fragment {
     }
 
     private void initialize(Bundle savedInstanceState) {
-        if (savedInstanceState != null)
-            isSliderOpen = savedInstanceState.getBoolean(SAVED_BUNDLE_IS_SLIDER_OPEN_KEY, false);
+//        if (savedInstanceState != null)
+//            isSliderOpen = savedInstanceState.getBoolean(SAVED_BUNDLE_IS_SLIDER_OPEN_KEY, false);
         initializeIngredientsRecyclerView();
         initializeStepsRecyclerView();
         slider.addPanelSlideListener(sliderListener);
@@ -150,8 +150,8 @@ public class RecipeStepListFragment extends Fragment {
         fadeIn.start();
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putBoolean(SAVED_BUNDLE_IS_SLIDER_OPEN_KEY, isSliderOpen);
-    }
+//    @Override
+//    public void onSaveInstanceState(Bundle outState) {
+//        outState.putBoolean(SAVED_BUNDLE_IS_SLIDER_OPEN_KEY, isSliderOpen);
+//    }
 }
