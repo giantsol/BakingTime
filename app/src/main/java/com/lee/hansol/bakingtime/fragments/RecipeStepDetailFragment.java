@@ -17,8 +17,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
@@ -98,14 +100,20 @@ public class RecipeStepDetailFragment extends Fragment {
     }
 
     private void setExoPlayerView(String videoUrlString) {
-        if (exoPlayer != null) exoPlayer.release();
+        if (exoPlayer != null) releaseExoPlayer();
         if ((videoUrlString == null) || (videoUrlString.length() == 0)) {
             showVideoEmptyView();
         } else if (!User.hasInternetConnection(getActivity())) {
             showVideoUnplayableView();
         } else {
-            showExoPlayerView(videoUrlString);
+            initializeExoPlayerView(Uri.parse(videoUrlString));
+            showExoPlayerView();
         }
+    }
+
+    private void releaseExoPlayer() {
+        exoPlayer.stop();
+        exoPlayer.release();
     }
 
     private void showVideoEmptyView() {
@@ -120,33 +128,23 @@ public class RecipeStepDetailFragment extends Fragment {
         brokenVideoText.setVisibility(View.VISIBLE);
         brokenVideoText.setText(getString(R.string.text_no_internet));
         exoPlayerView.setVisibility(View.GONE);
-
     }
-    private void showExoPlayerView(@NonNull String videoUrlString) {
-        initializeExoPlayer();
 
+    private void initializeExoPlayerView(@NonNull Uri videoUri) {
+        TrackSelector trackSelector = new DefaultTrackSelector();
+        exoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
+        String userAgent = Util.getUserAgent(getActivity(), "BakingTime");
+        MediaSource mediaSource = new ExtractorMediaSource(videoUri, new DefaultDataSourceFactory(
+                getActivity(), userAgent), new DefaultExtractorsFactory(), null, null);
+        exoPlayer.prepare(mediaSource);
+        exoPlayer.setPlayWhenReady(true);
         exoPlayerView.setPlayer(exoPlayer);
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getActivity(),
-                Util.getUserAgent(getActivity(), "BakingTime"));
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-        MediaSource videoSource = new ExtractorMediaSource(Uri.parse(videoUrlString),
-                dataSourceFactory, extractorsFactory, null, null);
-        exoPlayer.prepare(videoSource);
+    }
+
+    private void showExoPlayerView() {
         brokenVideoImage.setVisibility(View.GONE);
         brokenVideoText.setVisibility(View.GONE);
         exoPlayerView.setVisibility(View.VISIBLE);
-    }
-
-
-    private void initializeExoPlayer() {
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTrackSelectionFactory =
-                new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector =
-                new DefaultTrackSelector(videoTrackSelectionFactory);
-
-        exoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
-        exoPlayer.setPlayWhenReady(true);
     }
 
     @Override
@@ -155,7 +153,6 @@ public class RecipeStepDetailFragment extends Fragment {
         if ((exoPlayer != null) && (exoPlayer.getPlaybackState() == ExoPlayer.STATE_READY))
             exoPlayer.setPlayWhenReady(false);
     }
-
 
     @OnClick({R.id.fragment_recipe_step_detail_previous_btn, R.id.fragment_recipe_step_detail_next_btn})
     void onButtonClick(View v) {
@@ -169,7 +166,7 @@ public class RecipeStepDetailFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-        if (exoPlayer != null) exoPlayer.release();
+        if (exoPlayer != null) releaseExoPlayer();
     }
 
     public void slideLeftRenewSlideRightEnter() {
