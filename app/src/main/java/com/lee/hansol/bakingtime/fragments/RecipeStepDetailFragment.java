@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -50,27 +49,18 @@ public class RecipeStepDetailFragment extends Fragment {
     private OnPrevNextButtonClickListener prevNextButtonClickListener;
     private View rootView;
     @Nullable private SimpleExoPlayer exoPlayer;
+    public boolean isFullView = false;
 
-    @BindView(R.id.fragment_recipe_step_detail_short_description)
-    TextView shortDescriptionView;
-    @BindView(R.id.fragment_recipe_step_detail_exoplayerview)
-    SimpleExoPlayerView exoPlayerView;
-    @BindView(R.id.fragment_recipe_step_detail_description)
-    TextView descriptionView;
-    @BindView(R.id.fragment_recipe_step_detail_previous_btn)
-    Button previousButton;
-    @BindView(R.id.fragment_recipe_step_detail_next_btn)
-    Button nextButton;
-    @BindView(R.id.fragment_recipe_step_detail_broken_video_image)
-    ImageView brokenVideoImage;
-    @BindView(R.id.fragment_recipe_step_detail_broken_video_text)
-    TextView brokenVideoText;
-    @BindView(R.id.exo_full)
-    ImageButton exoFullButton;
-    @BindView(R.id.exo_full_exit)
-    ImageButton exoFullExitButton;
-    @BindView(R.id.fragment_recipe_step_detail_exoplayerview_container)
-    View exoPlayerViewContainer;
+    @BindView(R.id.fragment_recipe_step_detail_short_description) TextView shortDescriptionView;
+    @BindView(R.id.fragment_recipe_step_detail_exoplayerview) SimpleExoPlayerView exoPlayerView;
+    @BindView(R.id.fragment_recipe_step_detail_description) TextView descriptionView;
+    @BindView(R.id.fragment_recipe_step_detail_previous_btn) Button previousButton;
+    @BindView(R.id.fragment_recipe_step_detail_next_btn) Button nextButton;
+    @BindView(R.id.fragment_recipe_step_detail_broken_video_image) ImageView brokenVideoImage;
+    @BindView(R.id.fragment_recipe_step_detail_broken_video_text) TextView brokenVideoText;
+    @BindView(R.id.exo_full) ImageButton exoFullButton;
+    @BindView(R.id.exo_full_exit) ImageButton exoFullExitButton;
+    @BindView(R.id.fragment_recipe_step_detail_exoplayerview_container) View exoPlayerViewContainer;
 
     public interface OnPrevNextButtonClickListener {
         void onPrevButtonClicked();
@@ -105,9 +95,9 @@ public class RecipeStepDetailFragment extends Fragment {
         }
     }
 
-    private void setExoPlayerView(String videoUrlString) {
+    private void setExoPlayerView(@Nullable String videoUrlString) {
         if (exoPlayer != null) releaseExoPlayer();
-        if ((videoUrlString == null) || (videoUrlString.length() == 0)) {
+        if ((videoUrlString == null) || videoUrlString.isEmpty()) {
             showVideoEmptyView();
         } else if (!User.hasInternetConnection(getActivity())) {
             showVideoUnplayableView();
@@ -137,27 +127,24 @@ public class RecipeStepDetailFragment extends Fragment {
     }
 
     private void initializeExoPlayerView(@NonNull Uri videoUri) {
+        initializeExoPlayer(videoUri);
+        exoPlayerView.setPlayer(exoPlayer);
+    }
+
+    private void initializeExoPlayer(@NonNull Uri videoUri) {
         TrackSelector trackSelector = new DefaultTrackSelector();
         exoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
-        String userAgent = Util.getUserAgent(getActivity(), "BakingTime");
+        String userAgent = Util.getUserAgent(getActivity(), getString(R.string.app_name));
         MediaSource mediaSource = new ExtractorMediaSource(videoUri, new DefaultDataSourceFactory(
                 getActivity(), userAgent), new DefaultExtractorsFactory(), null, null);
         exoPlayer.prepare(mediaSource);
         exoPlayer.setPlayWhenReady(true);
-        exoPlayerView.setPlayer(exoPlayer);
     }
 
     private void showExoPlayerView() {
         brokenVideoImage.setVisibility(View.GONE);
         brokenVideoText.setVisibility(View.GONE);
         exoPlayerView.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if ((exoPlayer != null) && (exoPlayer.getPlaybackState() == ExoPlayer.STATE_READY))
-            exoPlayer.setPlayWhenReady(false);
     }
 
     @OnClick({R.id.fragment_recipe_step_detail_previous_btn, R.id.fragment_recipe_step_detail_next_btn})
@@ -170,42 +157,103 @@ public class RecipeStepDetailFragment extends Fragment {
 
     @OnClick(R.id.exo_full)
     void onFullButtonClick() {
-        exoFullButton.setVisibility(View.GONE);
-        exoFullExitButton.setVisibility(View.VISIBLE);
+        enterVideoFullMode();
+    }
+
+    private void enterVideoFullMode() {
+        isFullView = true;
+        toggleFullButton();
+        hideAllViewsExceptVideo();
+        setVideoSizeMatchParent();
+        setWindowToFullScreen();
+        setVideoBackgroundToBlack();
+    }
+
+    private void toggleFullButton() {
+        if (isFullView) {
+            exoFullButton.setVisibility(View.GONE);
+            exoFullExitButton.setVisibility(View.VISIBLE);
+        } else {
+            exoFullButton.setVisibility(View.VISIBLE);
+            exoFullExitButton.setVisibility(View.GONE);
+        }
+    }
+
+    private void hideAllViewsExceptVideo() {
         shortDescriptionView.setVisibility(View.GONE);
         descriptionView.setVisibility(View.GONE);
         previousButton.setVisibility(View.GONE);
         nextButton.setVisibility(View.GONE);
+    }
+
+    private void setVideoSizeMatchParent() {
         ViewGroup.LayoutParams params = exoPlayerViewContainer.getLayoutParams();
         params.width = ViewGroup.LayoutParams.MATCH_PARENT;
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
         exoPlayerViewContainer.setLayoutParams(params);
+    }
+
+    private void setWindowToFullScreen() {
         getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+    }
+
+    private void setVideoBackgroundToBlack() {
         exoPlayerViewContainer.setBackgroundColor(Color.BLACK);
     }
 
     @OnClick(R.id.exo_full_exit)
     void onFullExitButtonClick() {
-        exoFullExitButton.setVisibility(View.GONE);
-        exoFullButton.setVisibility(View.VISIBLE);
+        exitVideoFullMode();
+    }
+
+    private void exitVideoFullMode() {
+        isFullView = false;
+        toggleFullButton();
+        showAllViews();
+        setVideoSizeToNormal();
+        setWindowToNormal();
+        setVideoBackgroundToNormal();
+    }
+
+    private void showAllViews() {
         shortDescriptionView.setVisibility(View.VISIBLE);
         descriptionView.setVisibility(View.VISIBLE);
         previousButton.setVisibility(View.VISIBLE);
         nextButton.setVisibility(View.VISIBLE);
+    }
+
+    private void setVideoSizeToNormal() {
         ViewGroup.LayoutParams params = exoPlayerViewContainer.getLayoutParams();
         params.width = 0;
         params.height = (int) getActivity().getResources().getDimension(R.dimen.video_height);
         exoPlayerViewContainer.setLayoutParams(params);
+    }
+
+    private void setWindowToNormal() {
         getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+    }
+
+    private void setVideoBackgroundToNormal() {
         TypedArray array = getActivity().getTheme().obtainStyledAttributes(new int[] {
                 android.R.attr.colorBackground,
         });
         int backgroundColor = array.getColor(0, 0xFF00FF);
         exoPlayerViewContainer.setBackgroundColor(backgroundColor);
         array.recycle();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        pauseExoPlayer();
+    }
+
+    private void pauseExoPlayer() {
+        if ((exoPlayer != null) && (exoPlayer.getPlaybackState() == ExoPlayer.STATE_READY))
+            exoPlayer.setPlayWhenReady(false);
     }
 
     @Override
