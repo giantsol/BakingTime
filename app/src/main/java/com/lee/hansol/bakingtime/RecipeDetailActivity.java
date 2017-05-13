@@ -1,7 +1,6 @@
 package com.lee.hansol.bakingtime;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -133,6 +132,8 @@ public class RecipeDetailActivity extends AppCompatActivity
             closeIngredientsSlider();
         else if (!User.isTablet(this) && isStepDetailFragmentVisible)
             replaceStepDetailFragmentWithStepListFragment();
+        else if (isStepDetailFragmentVisible && stepDetailFragment.isFullMode)
+            stepDetailFragment.exitVideoFullMode();
         else
             super.onBackPressed();
     }
@@ -315,10 +316,15 @@ public class RecipeDetailActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == android.R.id.home && !drawerToggle.isDrawerIndicatorEnabled()) {
-            replaceStepDetailFragmentWithStepListFragment();
-            return true;
-        } else
-            return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
+        if (id == android.R.id.home) {
+            if (!drawerToggle.isDrawerIndicatorEnabled()) {
+                replaceStepDetailFragmentWithStepListFragment();
+                return true;
+            } else if (isStepDetailFragmentVisible && stepDetailFragment.isFullMode) {
+                stepDetailFragment.exitVideoFullMode();
+                return true;
+            }
+        }
+        return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 }

@@ -9,7 +9,6 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -21,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -42,14 +42,15 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-import static com.lee.hansol.bakingtime.utils.LogUtils.log;
-
 public class RecipeStepDetailFragment extends Fragment {
     private Unbinder unbinder;
+    private Step step;
     private OnPrevNextButtonClickListener prevNextButtonClickListener;
     private View rootView;
     @Nullable private SimpleExoPlayer exoPlayer;
-    public boolean isFullView = false;
+    public boolean isFullMode = false;
+    private int resumeWindow;
+    private long resumePosition;
 
     @BindView(R.id.fragment_recipe_step_detail_short_description) TextView shortDescriptionView;
     @BindView(R.id.fragment_recipe_step_detail_exoplayerview) SimpleExoPlayerView exoPlayerView;
@@ -87,29 +88,39 @@ public class RecipeStepDetailFragment extends Fragment {
     }
 
     private void initialize() {
-        Step step = DataHelper.getInstance().getCurrentStepObject();
+        clearExoPlayerResumePosition();
+        step = DataHelper.getInstance().getCurrentStepObject();
         if (step != null) {
             shortDescriptionView.setText(step.shortDescription);
             descriptionView.setText(step.description);
-            setExoPlayerView(step.videoUrlString);
         }
     }
 
-    private void setExoPlayerView(@Nullable String videoUrlString) {
+    @Override
+    public void onStart() {
+        super.onStart();
+        setExoPlayerView();
+    }
+
+    private void setExoPlayerView() {
         if (exoPlayer != null) releaseExoPlayer();
-        if ((videoUrlString == null) || videoUrlString.isEmpty()) {
+        if ((step.videoUrlString == null) || step.videoUrlString.isEmpty()) {
             showVideoEmptyView();
         } else if (!User.hasInternetConnection(getActivity())) {
             showVideoUnplayableView();
         } else {
-            initializeExoPlayerView(Uri.parse(videoUrlString));
+            initializeExoPlayerView();
             showExoPlayerView();
         }
     }
 
     private void releaseExoPlayer() {
-        exoPlayer.stop();
-        exoPlayer.release();
+        if (exoPlayer != null) {
+            pauseExoPlayer();
+            exoPlayer.stop();
+            exoPlayer.release();
+        }
+        exoPlayer = null;
     }
 
     private void showVideoEmptyView() {
@@ -126,19 +137,26 @@ public class RecipeStepDetailFragment extends Fragment {
         exoPlayerView.setVisibility(View.GONE);
     }
 
-    private void initializeExoPlayerView(@NonNull Uri videoUri) {
-        initializeExoPlayer(videoUri);
+    private void initializeExoPlayerView() {
+        initializeExoPlayer();
         exoPlayerView.setPlayer(exoPlayer);
     }
 
-    private void initializeExoPlayer(@NonNull Uri videoUri) {
+    private void initializeExoPlayer() {
         TrackSelector trackSelector = new DefaultTrackSelector();
         exoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
         String userAgent = Util.getUserAgent(getActivity(), getString(R.string.app_name));
+        Uri videoUri = Uri.parse(step.videoUrlString);
         MediaSource mediaSource = new ExtractorMediaSource(videoUri, new DefaultDataSourceFactory(
                 getActivity(), userAgent), new DefaultExtractorsFactory(), null, null);
+
+        boolean hasResumePosition = resumeWindow != C.INDEX_UNSET;
+        if (hasResumePosition) {
+            exoPlayer.seekTo(resumeWindow, resumePosition);
+        }
         exoPlayer.prepare(mediaSource);
         exoPlayer.setPlayWhenReady(true);
+        exitVideoFullMode();
     }
 
     private void showExoPlayerView() {
@@ -161,7 +179,8 @@ public class RecipeStepDetailFragment extends Fragment {
     }
 
     private void enterVideoFullMode() {
-        isFullView = true;
+        if (isFullMode) return;
+        isFullMode = true;
         toggleFullButton();
         hideAllViewsExceptVideo();
         setVideoSizeMatchParent();
@@ -170,7 +189,7 @@ public class RecipeStepDetailFragment extends Fragment {
     }
 
     private void toggleFullButton() {
-        if (isFullView) {
+        if (isFullMode) {
             exoFullButton.setVisibility(View.GONE);
             exoFullExitButton.setVisibility(View.VISIBLE);
         } else {
@@ -208,8 +227,9 @@ public class RecipeStepDetailFragment extends Fragment {
         exitVideoFullMode();
     }
 
-    private void exitVideoFullMode() {
-        isFullView = false;
+    public void exitVideoFullMode() {
+        if (!isFullMode) return;
+        isFullMode = false;
         toggleFullButton();
         showAllViews();
         setVideoSizeToNormal();
@@ -257,10 +277,30 @@ public class RecipeStepDetailFragment extends Fragment {
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        if (exoPlayer != null) {
+            updateExoPlayerResumePosition();
+            releaseExoPlayer();
+        }
+    }
+
+    private void updateExoPlayerResumePosition() {
+        resumeWindow = exoPlayer.getCurrentWindowIndex();
+        resumePosition = exoPlayer.isCurrentWindowSeekable() ? Math.max(0, exoPlayer.getCurrentPosition())
+                : C.TIME_UNSET;
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-        if (exoPlayer != null) releaseExoPlayer();
+        clearExoPlayerResumePosition();
+    }
+
+    private void clearExoPlayerResumePosition() {
+        resumeWindow = C.INDEX_UNSET;
+        resumePosition = C.TIME_UNSET;
     }
 
     public void slideLeftRenewSlideRightEnter() {
@@ -270,13 +310,18 @@ public class RecipeStepDetailFragment extends Fragment {
         slideLeft.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                initialize();
+                renew();
                 animation.removeAllListeners();
                 slideRightEnter();
             }
         });
         slideLeft.setTarget(rootView);
         slideLeft.start();
+    }
+
+    private void renew() {
+        initialize();
+        setExoPlayerView();
     }
 
     private void slideRightEnter() {
@@ -299,7 +344,7 @@ public class RecipeStepDetailFragment extends Fragment {
         slideRight.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                initialize();
+                renew();
                 animation.removeAllListeners();
                 slideRightEnter();
             }
@@ -315,7 +360,7 @@ public class RecipeStepDetailFragment extends Fragment {
         slideLeft.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                initialize();
+                renew();
                 animation.removeAllListeners();
                 slideLeftEnter();
             }
