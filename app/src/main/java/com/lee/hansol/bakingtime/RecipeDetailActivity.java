@@ -231,8 +231,8 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     private void clearStepDetailFragmentContainerIfTablet() {
         if (User.isTablet(this) && isStepDetailFragmentVisible) {
-            getFragmentManager().beginTransaction().
-                    setCustomAnimations(0, R.animator.fragment_fade_out)
+            getFragmentManager().beginTransaction()
+                    .setCustomAnimations(0, R.animator.fragment_fade_out)
                     .remove(stepDetailFragment).commit();
             isStepDetailFragmentVisible = false;
         }

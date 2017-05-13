@@ -5,35 +5,32 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.res.TypedArray;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
-import com.google.android.exoplayer2.upstream.BandwidthMeter;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.lee.hansol.bakingtime.R;
@@ -45,6 +42,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+
+import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 public class RecipeStepDetailFragment extends Fragment {
     private Unbinder unbinder;
@@ -64,7 +63,14 @@ public class RecipeStepDetailFragment extends Fragment {
     Button nextButton;
     @BindView(R.id.fragment_recipe_step_detail_broken_video_image)
     ImageView brokenVideoImage;
-    @BindView(R.id.fragment_recipe_step_detail_broken_video_text) TextView brokenVideoText;
+    @BindView(R.id.fragment_recipe_step_detail_broken_video_text)
+    TextView brokenVideoText;
+    @BindView(R.id.exo_full)
+    ImageButton exoFullButton;
+    @BindView(R.id.exo_full_exit)
+    ImageButton exoFullExitButton;
+    @BindView(R.id.fragment_recipe_step_detail_exoplayerview_container)
+    View exoPlayerViewContainer;
 
     public interface OnPrevNextButtonClickListener {
         void onPrevButtonClicked();
@@ -155,11 +161,51 @@ public class RecipeStepDetailFragment extends Fragment {
     }
 
     @OnClick({R.id.fragment_recipe_step_detail_previous_btn, R.id.fragment_recipe_step_detail_next_btn})
-    void onButtonClick(View v) {
+    void onPrevNextButtonClick(View v) {
         if (v.getId() == R.id.fragment_recipe_step_detail_previous_btn)
             prevNextButtonClickListener.onPrevButtonClicked();
         else
             prevNextButtonClickListener.onNextButtonClicked();
+    }
+
+    @OnClick(R.id.exo_full)
+    void onFullButtonClick() {
+        exoFullButton.setVisibility(View.GONE);
+        exoFullExitButton.setVisibility(View.VISIBLE);
+        shortDescriptionView.setVisibility(View.GONE);
+        descriptionView.setVisibility(View.GONE);
+        previousButton.setVisibility(View.GONE);
+        nextButton.setVisibility(View.GONE);
+        ViewGroup.LayoutParams params = exoPlayerViewContainer.getLayoutParams();
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        exoPlayerViewContainer.setLayoutParams(params);
+        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+        exoPlayerViewContainer.setBackgroundColor(Color.BLACK);
+    }
+
+    @OnClick(R.id.exo_full_exit)
+    void onFullExitButtonClick() {
+        exoFullExitButton.setVisibility(View.GONE);
+        exoFullButton.setVisibility(View.VISIBLE);
+        shortDescriptionView.setVisibility(View.VISIBLE);
+        descriptionView.setVisibility(View.VISIBLE);
+        previousButton.setVisibility(View.VISIBLE);
+        nextButton.setVisibility(View.VISIBLE);
+        ViewGroup.LayoutParams params = exoPlayerViewContainer.getLayoutParams();
+        params.width = 0;
+        params.height = (int) getActivity().getResources().getDimension(R.dimen.video_height);
+        exoPlayerViewContainer.setLayoutParams(params);
+        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+        TypedArray array = getActivity().getTheme().obtainStyledAttributes(new int[] {
+                android.R.attr.colorBackground,
+        });
+        int backgroundColor = array.getColor(0, 0xFF00FF);
+        exoPlayerViewContainer.setBackgroundColor(backgroundColor);
+        array.recycle();
     }
 
     @Override
