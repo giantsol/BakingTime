@@ -31,7 +31,9 @@
             <com.google.android.exoplayer2.ui.SimpleExoPlayerView
                 android:id="@+id/fragment_recipe_step_detail_exoplayerview"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent"
+                app:fastforward_increment="5000"
+                app:rewind_increment="5000"/>
             <ImageView
                 android:id="@+id/fragment_recipe_step_detail_broken_video_image"
                 android:layout_width="match_parent"
