@@ -5,6 +5,7 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.net.Uri;
@@ -385,5 +386,16 @@ public class RecipeStepDetailFragment extends Fragment {
         });
         slideLeftEnter.setTarget(rootView);
         slideLeftEnter.start();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if ((newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) && !isFullMode) {
+            enterVideoFullMode();
+        } else if ((newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) && isFullMode) {
+            exitVideoFullMode();
+        }
     }
 }
