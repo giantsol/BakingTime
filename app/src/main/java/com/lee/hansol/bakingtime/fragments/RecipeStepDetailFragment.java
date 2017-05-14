@@ -22,13 +22,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -45,7 +50,7 @@ import butterknife.Unbinder;
 
 import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
-public class RecipeStepDetailFragment extends Fragment {
+public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.EventListener {
     private Unbinder unbinder;
     private Step step;
     private OnPrevNextButtonClickListener prevNextButtonClickListener;
@@ -161,6 +166,7 @@ public class RecipeStepDetailFragment extends Fragment {
         }
         exoPlayer.prepare(mediaSource);
         exoPlayer.setPlayWhenReady(true);
+        exoPlayer.addListener(this);
         exitVideoFullMode();
     }
 
@@ -392,10 +398,55 @@ public class RecipeStepDetailFragment extends Fragment {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        if ((newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) && !isFullMode) {
+        if (turnsLandscapeWhilstNotFullMode(newConfig))
             enterVideoFullMode();
-        } else if ((newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) && isFullMode) {
+        else if (turnsPortraitWhilstFullMode(newConfig))
             exitVideoFullMode();
+    }
+
+    private boolean turnsLandscapeWhilstNotFullMode(Configuration newConfig) {
+        return (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) && !isFullMode;
+    }
+
+    private boolean turnsPortraitWhilstFullMode(Configuration newConfig) {
+        return (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) && isFullMode;
+    }
+
+    @Override
+    public void onTimelineChanged(Timeline timeline, Object manifest) {
+
+    }
+
+    @Override
+    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+
+    }
+
+    @Override
+    public void onLoadingChanged(boolean isLoading) {
+
+    }
+
+    @Override
+    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        if (playbackState == ExoPlayer.STATE_ENDED) {
+            if (exoPlayer != null)
+                exoPlayer.setPlayWhenReady(false);
         }
+    }
+
+    @Override
+    public void onPlayerError(ExoPlaybackException error) {
+
+    }
+
+    @Override
+    public void onPositionDiscontinuity() {
+
+    }
+
+    @Override
+    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+
     }
 }
