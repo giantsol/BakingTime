@@ -1,6 +1,8 @@
 package com.lee.hansol.bakingtime.adapters;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -45,11 +47,32 @@ public class StepsRecyclerViewAdapter
     public void onBindViewHolder(StepViewHolder holder, int position) {
         Step step = DataHelper.getInstance().getStepObjectAt(position);
         if (step != null) {
-            String text = String.format(Locale.getDefault(),
-                    context.getString(R.string.text_step_placeholder),
-                    step.stepOrder, step.shortDescription);
-            holder.textView.setText(text);
+            if (step == DataHelper.getInstance().getCurrentStepObject())
+                setCurrentStepView(holder, step);
+            else
+                setOtherStepView(holder, step);
         }
+    }
+
+    private void setCurrentStepView(StepViewHolder holder, @NonNull Step step) {
+        String text = String.format(Locale.getDefault(),
+                context.getString(R.string.text_step_placeholder),
+                step.stepOrder, step.shortDescription);
+        holder.textView.setText(text);
+        holder.itemView.setBackgroundColor(Color.LTGRAY);
+    }
+
+    private void setOtherStepView(StepViewHolder holder, @NonNull Step step) {
+        String text = String.format(Locale.getDefault(),
+                context.getString(R.string.text_step_placeholder),
+                step.stepOrder, step.shortDescription);
+        holder.textView.setText(text);
+        TypedArray array = context.getTheme().obtainStyledAttributes(new int[] {
+                android.R.attr.colorBackground,
+        });
+        int backgroundColor = array.getColor(0, 0xFF00FF);
+        holder.itemView.setBackgroundColor(backgroundColor);
+        array.recycle();
     }
 
     @Override

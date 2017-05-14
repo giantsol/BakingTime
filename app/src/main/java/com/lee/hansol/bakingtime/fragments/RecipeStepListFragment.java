@@ -17,6 +17,7 @@ import android.view.WindowManager;
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.adapters.IngredientsRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.adapters.StepsRecyclerViewAdapter;
+import com.lee.hansol.bakingtime.helpers.DataHelper;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import butterknife.BindView;
@@ -28,7 +29,6 @@ public class RecipeStepListFragment extends Fragment {
     private StepsRecyclerViewAdapter.OnStepItemClickListener stepItemClickListener;
     private View rootView;
     public boolean isSliderOpen = false;
-//    private final String SAVED_BUNDLE_IS_SLIDER_OPEN_KEY = "is_slider_open";
 
     @BindView(R.id.fragment_recipe_step_list_ingredients_view) RecyclerView ingredientsRecyclerView;
     @BindView(R.id.fragment_recipe_step_list_steps_view) RecyclerView stepsRecyclerView;
@@ -54,8 +54,6 @@ public class RecipeStepListFragment extends Fragment {
     }
 
     private void initialize(Bundle savedInstanceState) {
-//        if (savedInstanceState != null)
-//            isSliderOpen = savedInstanceState.getBoolean(SAVED_BUNDLE_IS_SLIDER_OPEN_KEY, false);
         initializeIngredientsRecyclerView();
         initializeStepsRecyclerView();
         slider.addPanelSlideListener(sliderListener);
@@ -91,6 +89,7 @@ public class RecipeStepListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         determineStepListItemClickable();
+        notifyAdapter();
     }
 
     private void determineStepListItemClickable() {
@@ -148,8 +147,9 @@ public class RecipeStepListFragment extends Fragment {
         fadeIn.start();
     }
 
-//    @Override
-//    public void onSaveInstanceState(Bundle outState) {
-//        outState.putBoolean(SAVED_BUNDLE_IS_SLIDER_OPEN_KEY, isSliderOpen);
-//    }
+    public void notifyAdapter() {
+        stepsRecyclerView.getAdapter().notifyDataSetChanged();
+        if (DataHelper.getInstance().getCurrentStepIndex() != -1)
+            stepsRecyclerView.scrollToPosition(DataHelper.getInstance().getCurrentStepIndex());
+    }
 }

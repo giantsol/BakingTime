@@ -101,6 +101,7 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
 
     private void initialize() {
         clearExoPlayerResumePosition();
+        exitVideoFullMode();
         step = DataHelper.getInstance().getCurrentStepObject();
         if (step != null) {
             shortDescriptionView.setText(step.shortDescription);
@@ -424,6 +425,7 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
     private class SwipeListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            if (isFullMode) return false;
             float fromX = e1.getX();
             float toX = e2.getX();
             if ((toX - fromX) <= -500) swipeRight();

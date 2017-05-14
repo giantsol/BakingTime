@@ -249,8 +249,10 @@ public class RecipeDetailActivity extends AppCompatActivity
     @Override
     public void onStepItemClick(int stepIndex) {
         DataHelper.getInstance().setCurrentStepIndex(stepIndex);
-        if (User.isTablet(this))
+        if (User.isTablet(this)) {
             showStepDetailFragmentInRightPanel();
+            stepListFragment.notifyAdapter();
+        }
         else
             replaceStepListFragmentWithStepDetailFragment();
     }
@@ -280,6 +282,8 @@ public class RecipeDetailActivity extends AppCompatActivity
         if (DataHelper.getInstance().hasPreviousStep()) {
             DataHelper.getInstance().moveToPreviousStep();
             stepDetailFragment.slideRightRenewSlideRightEnter();
+            if (User.isTablet(this))
+                stepListFragment.notifyAdapter();
         } else {
             showTryingToGoPreviousAnimation();
         }
@@ -294,6 +298,8 @@ public class RecipeDetailActivity extends AppCompatActivity
         if (DataHelper.getInstance().hasNextStep()) {
             DataHelper.getInstance().moveToNextStep();
             stepDetailFragment.slideLeftRenewSlideLeftEnter();
+            if (User.isTablet(this))
+                stepListFragment.notifyAdapter();
         } else {
             showTryingToGoNextAnimation();
         }
@@ -332,7 +338,7 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (stepDetailFragment.gestureDetector != null)
+        if (isStepDetailFragmentVisible && (stepDetailFragment.gestureDetector != null))
             stepDetailFragment.gestureDetector.onTouchEvent(ev);
         return super.dispatchTouchEvent(ev);
     }
