@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        LogUtils.context = this;
+        LogUtils.setContext(this);
 
         initialize();
     }
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     protected void onDestroy() {
-        LogUtils.context = null;
+        LogUtils.setContext(null);
         super.onDestroy();
     }
 }

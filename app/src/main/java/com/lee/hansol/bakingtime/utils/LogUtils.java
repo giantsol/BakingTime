@@ -8,7 +8,9 @@ public class LogUtils {
     private static final String TAG = "hello";
 
     //still a bad practice although I set this to null in onDestroy of MainActivity?
-    public static Context context = null;
+    private static Context context = null;
+
+    public static void setContext(Context context) { LogUtils.context = context; }
 
     public static void log(String msg) {
         Log.d(TAG, msg);

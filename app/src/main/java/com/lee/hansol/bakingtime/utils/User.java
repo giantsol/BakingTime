@@ -5,9 +5,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.DisplayMetrics;
-import android.view.WindowManager;
-
-import static com.lee.hansol.bakingtime.utils.LogUtils.context;
 
 public class User {
 
