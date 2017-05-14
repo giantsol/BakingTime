@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.lee.hansol.bakingtime.adapters.DrawerRecyclerViewAdapter;
@@ -24,6 +25,8 @@ import com.lee.hansol.bakingtime.utils.User;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 
 public class RecipeDetailActivity extends AppCompatActivity
@@ -280,7 +283,6 @@ public class RecipeDetailActivity extends AppCompatActivity
         } else {
             showTryingToGoPreviousAnimation();
         }
-
     }
 
     private void showTryingToGoPreviousAnimation() {
@@ -326,5 +328,12 @@ public class RecipeDetailActivity extends AppCompatActivity
             }
         }
         return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (stepDetailFragment.gestureDetector != null)
+            stepDetailFragment.gestureDetector.onTouchEvent(ev);
+        return super.dispatchTouchEvent(ev);
     }
 }

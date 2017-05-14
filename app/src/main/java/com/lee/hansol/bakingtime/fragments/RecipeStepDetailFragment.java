@@ -11,8 +11,11 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -59,6 +62,7 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
     public boolean isFullMode = false;
     private int exoResumeWindow;
     private long exoResumePosition;
+    public GestureDetectorCompat gestureDetector;
 
     @BindView(R.id.fragment_recipe_step_detail_short_description) TextView shortDescriptionView;
     @BindView(R.id.fragment_recipe_step_detail_exoplayerview) SimpleExoPlayerView exoPlayerView;
@@ -103,6 +107,7 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
             descriptionView.setText(step.description);
             setExoPlayerView();
         }
+        gestureDetector = new GestureDetectorCompat(getActivity(), new SwipeListener());
     }
 
     private void setExoPlayerView() {
@@ -398,18 +403,41 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        if (turnsLandscapeWhilstNotFullMode(newConfig))
+        if (turnsLandscapeWhilstVideoNotFullMode(newConfig))
             enterVideoFullMode();
-        else if (turnsPortraitWhilstFullMode(newConfig))
+        else if (turnsPortraitWhilstVideoFullMode(newConfig))
             exitVideoFullMode();
     }
 
-    private boolean turnsLandscapeWhilstNotFullMode(Configuration newConfig) {
-        return (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) && !isFullMode;
+    private boolean turnsLandscapeWhilstVideoNotFullMode(Configuration newConfig) {
+        return (exoPlayer != null)
+                && (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+                && !isFullMode;
     }
 
-    private boolean turnsPortraitWhilstFullMode(Configuration newConfig) {
-        return (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) && isFullMode;
+    private boolean turnsPortraitWhilstVideoFullMode(Configuration newConfig) {
+        return (exoPlayer != null)
+                && (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)
+                && isFullMode;
+    }
+
+    private class SwipeListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            float fromX = e1.getX();
+            float toX = e2.getX();
+            if ((toX - fromX) <= -500) swipeRight();
+            else if ((toX - fromX) >= 500) swipeLeft();
+            return true;
+        }
+    }
+
+    private void swipeRight() {
+        prevNextButtonClickListener.onNextButtonClicked();
+    }
+
+    private void swipeLeft() {
+        prevNextButtonClickListener.onPrevButtonClicked();
     }
 
     @Override
