@@ -42,6 +42,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
+import static com.lee.hansol.bakingtime.utils.LogUtils.log;
+
 public class RecipeStepDetailFragment extends Fragment {
     private Unbinder unbinder;
     private Step step;
@@ -49,8 +51,8 @@ public class RecipeStepDetailFragment extends Fragment {
     private View rootView;
     @Nullable private SimpleExoPlayer exoPlayer;
     public boolean isFullMode = false;
-    private int resumeWindow;
-    private long resumePosition;
+    private int exoResumeWindow;
+    private long exoResumePosition;
 
     @BindView(R.id.fragment_recipe_step_detail_short_description) TextView shortDescriptionView;
     @BindView(R.id.fragment_recipe_step_detail_exoplayerview) SimpleExoPlayerView exoPlayerView;
@@ -93,13 +95,8 @@ public class RecipeStepDetailFragment extends Fragment {
         if (step != null) {
             shortDescriptionView.setText(step.shortDescription);
             descriptionView.setText(step.description);
+            setExoPlayerView();
         }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        setExoPlayerView();
     }
 
     private void setExoPlayerView() {
@@ -119,8 +116,14 @@ public class RecipeStepDetailFragment extends Fragment {
             pauseExoPlayer();
             exoPlayer.stop();
             exoPlayer.release();
+            log("Exoplayer released");
         }
         exoPlayer = null;
+    }
+
+    private void pauseExoPlayer() {
+        if ((exoPlayer != null) && (exoPlayer.getPlaybackState() == ExoPlayer.STATE_READY))
+            exoPlayer.setPlayWhenReady(false);
     }
 
     private void showVideoEmptyView() {
@@ -143,6 +146,7 @@ public class RecipeStepDetailFragment extends Fragment {
     }
 
     private void initializeExoPlayer() {
+        if (exoPlayer != null) releaseExoPlayer();
         TrackSelector trackSelector = new DefaultTrackSelector();
         exoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
         String userAgent = Util.getUserAgent(getActivity(), getString(R.string.app_name));
@@ -150,9 +154,9 @@ public class RecipeStepDetailFragment extends Fragment {
         MediaSource mediaSource = new ExtractorMediaSource(videoUri, new DefaultDataSourceFactory(
                 getActivity(), userAgent), new DefaultExtractorsFactory(), null, null);
 
-        boolean hasResumePosition = resumeWindow != C.INDEX_UNSET;
+        boolean hasResumePosition = exoResumeWindow != C.INDEX_UNSET;
         if (hasResumePosition) {
-            exoPlayer.seekTo(resumeWindow, resumePosition);
+            exoPlayer.seekTo(exoResumeWindow, exoResumePosition);
         }
         exoPlayer.prepare(mediaSource);
         exoPlayer.setPlayWhenReady(true);
@@ -163,6 +167,50 @@ public class RecipeStepDetailFragment extends Fragment {
         brokenVideoImage.setVisibility(View.GONE);
         brokenVideoText.setVisibility(View.GONE);
         exoPlayerView.setVisibility(View.VISIBLE);
+    }
+
+    private void clearExoPlayerResumePosition() {
+        exoResumeWindow = C.INDEX_UNSET;
+        exoResumePosition = C.TIME_UNSET;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        pauseExoPlayer();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (exoPlayer != null) {
+            updateExoPlayerResumePosition();
+            releaseExoPlayer();
+        }
+    }
+
+    private void updateExoPlayerResumePosition() {
+        exoResumeWindow = exoPlayer.getCurrentWindowIndex();
+        exoResumePosition = exoPlayer.isCurrentWindowSeekable() ? Math.max(0, exoPlayer.getCurrentPosition())
+                : C.TIME_UNSET;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (needToReloadExoPlayer())
+            initializeExoPlayerView();
+    }
+
+    private boolean needToReloadExoPlayer() {
+        return (exoPlayer == null) && (exoPlayerView.getVisibility() == View.VISIBLE);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+        clearExoPlayerResumePosition();
     }
 
     @OnClick({R.id.fragment_recipe_step_detail_previous_btn, R.id.fragment_recipe_step_detail_next_btn})
@@ -181,21 +229,16 @@ public class RecipeStepDetailFragment extends Fragment {
     private void enterVideoFullMode() {
         if (isFullMode) return;
         isFullMode = true;
-        toggleFullButton();
+        showFullExitButton();
         hideAllViewsExceptVideo();
         setVideoSizeMatchParent();
         setWindowToFullScreen();
         setVideoBackgroundToBlack();
     }
 
-    private void toggleFullButton() {
-        if (isFullMode) {
-            exoFullButton.setVisibility(View.GONE);
-            exoFullExitButton.setVisibility(View.VISIBLE);
-        } else {
-            exoFullButton.setVisibility(View.VISIBLE);
-            exoFullExitButton.setVisibility(View.GONE);
-        }
+    private void showFullExitButton() {
+        exoFullButton.setVisibility(View.GONE);
+        exoFullExitButton.setVisibility(View.VISIBLE);
     }
 
     private void hideAllViewsExceptVideo() {
@@ -230,11 +273,16 @@ public class RecipeStepDetailFragment extends Fragment {
     public void exitVideoFullMode() {
         if (!isFullMode) return;
         isFullMode = false;
-        toggleFullButton();
+        showFullButton();
         showAllViews();
         setVideoSizeToNormal();
         setWindowToNormal();
         setVideoBackgroundToNormal();
+    }
+
+    private void showFullButton() {
+        exoFullButton.setVisibility(View.VISIBLE);
+        exoFullExitButton.setVisibility(View.GONE);
     }
 
     private void showAllViews() {
@@ -265,44 +313,6 @@ public class RecipeStepDetailFragment extends Fragment {
         array.recycle();
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        pauseExoPlayer();
-    }
-
-    private void pauseExoPlayer() {
-        if ((exoPlayer != null) && (exoPlayer.getPlaybackState() == ExoPlayer.STATE_READY))
-            exoPlayer.setPlayWhenReady(false);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (exoPlayer != null) {
-            updateExoPlayerResumePosition();
-            releaseExoPlayer();
-        }
-    }
-
-    private void updateExoPlayerResumePosition() {
-        resumeWindow = exoPlayer.getCurrentWindowIndex();
-        resumePosition = exoPlayer.isCurrentWindowSeekable() ? Math.max(0, exoPlayer.getCurrentPosition())
-                : C.TIME_UNSET;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-        clearExoPlayerResumePosition();
-    }
-
-    private void clearExoPlayerResumePosition() {
-        resumeWindow = C.INDEX_UNSET;
-        resumePosition = C.TIME_UNSET;
-    }
-
     public void slideLeftRenewSlideRightEnter() {
         getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
@@ -310,18 +320,13 @@ public class RecipeStepDetailFragment extends Fragment {
         slideLeft.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                renew();
+                initialize();
                 animation.removeAllListeners();
                 slideRightEnter();
             }
         });
         slideLeft.setTarget(rootView);
         slideLeft.start();
-    }
-
-    private void renew() {
-        initialize();
-        setExoPlayerView();
     }
 
     private void slideRightEnter() {
@@ -344,7 +349,7 @@ public class RecipeStepDetailFragment extends Fragment {
         slideRight.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                renew();
+                initialize();
                 animation.removeAllListeners();
                 slideRightEnter();
             }
@@ -360,7 +365,7 @@ public class RecipeStepDetailFragment extends Fragment {
         slideLeft.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                renew();
+                initialize();
                 animation.removeAllListeners();
                 slideLeftEnter();
             }
