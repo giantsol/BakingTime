@@ -22,6 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.lee.hansol.bakingtime.utils.DataUtils.loadRecipesFromDb;
+import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 import static com.lee.hansol.bakingtime.utils.ToastUtils.toast;
 
 public class RecipeAppWidgetConfigureActivity extends Activity {

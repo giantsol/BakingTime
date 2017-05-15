@@ -7,9 +7,20 @@
     <TextView
         android:id="@+id/appwidget_recipe_name"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textSize="@dimen/textsize_big"
+        android:textColor="@android:color/black"/>
+    <ListView
+        android:id="@+id/appwidget_ingredients"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-    <!--<ListView-->
-        <!--android:id="@+id/appwidget_ingredients"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"/>-->
+    <TextView
+        android:id="@+id/appwidget_ingredients_empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:textSize="@dimen/textsize_bigger"
+        android:text="@string/text_appwidget_ingredients_empty"/>
 </LinearLayout>

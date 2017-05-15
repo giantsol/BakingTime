@@ -26,6 +26,7 @@
     <string name="text_next_button">Next</string>
     <string name="text_broken_video">URL either does not exist or is broken</string>
     <string name="text_no_internet">No internet connection</string>
+    <string name="text_appwidget_ingredients_empty">No Ingredients!!</string>
 
     <string name="content_description_drawer_open">Drawer open</string>
     <string name="content_description_drawer_close">Drawer close</string>

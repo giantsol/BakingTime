@@ -19,7 +19,7 @@ import static com.lee.hansol.bakingtime.utils.DataUtils.emptyIngredients;
 import static com.lee.hansol.bakingtime.utils.DataUtils.emptyRecipes;
 import static com.lee.hansol.bakingtime.utils.DataUtils.emptySteps;
 
-class DbUtils {
+public class DbUtils {
 
     static Cursor getRecipesTableCursor(Context context) {
         return context.getContentResolver().query(BakingProvider.Recipes.CONTENT_URI,
@@ -44,7 +44,7 @@ class DbUtils {
         return recipes.toArray(emptyRecipes);
     }
 
-    private static Recipe getRecipeObjectFrom(Context context, @NonNull Cursor cursor) {
+    public static Recipe getRecipeObjectFrom(Context context, @NonNull Cursor cursor) {
         int recipeId = cursor.getInt(cursor.getColumnIndex(RecipeColumns.RECIPE_ID));
         String recipeName = cursor.getString(cursor.getColumnIndex(RecipeColumns.NAME));
         Ingredient[] ingredients = getIngredientsOf(context, recipeId);
