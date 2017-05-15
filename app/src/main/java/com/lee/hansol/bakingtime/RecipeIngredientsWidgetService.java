@@ -27,13 +27,16 @@ public class RecipeIngredientsWidgetService extends RemoteViewsService {
 
 class RecipeIngredientsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private Context context;
-    private final Ingredient[] ingredients;
+    private Ingredient[] ingredients = new Ingredient[0];
     private int appwidgetId;
 
     RecipeIngredientsRemoteViewsFactory(Context context, Intent intent) {
         this.context = context;
         appwidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-        Toast.makeText(context, "widgetid: " + appwidgetId, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCreate() {
         SharedPreferences prefs = context.getSharedPreferences(RecipeAppWidgetProvider.WIDGET_PREFS_NAME, Context.MODE_PRIVATE);
         int recipeId = prefs.getInt(appwidgetId+"", 0);
         Cursor cursor = context.getContentResolver().query(BakingProvider.Recipes.CONTENT_URI,
@@ -49,11 +52,6 @@ class RecipeIngredientsRemoteViewsFactory implements RemoteViewsService.RemoteVi
         } else {
             ingredients = new Ingredient[0];
         }
-    }
-
-    @Override
-    public void onCreate() {
-
     }
 
     @Override

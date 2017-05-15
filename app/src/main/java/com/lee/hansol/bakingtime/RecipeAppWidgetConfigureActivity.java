@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.helpers.DataHelper;
@@ -21,6 +24,7 @@ import com.lee.hansol.bakingtime.utils.DataUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.lee.hansol.bakingtime.R.layout.appwidget;
 import static com.lee.hansol.bakingtime.utils.DataUtils.loadRecipesFromDb;
 import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 import static com.lee.hansol.bakingtime.utils.ToastUtils.toast;
@@ -77,10 +81,19 @@ public class RecipeAppWidgetConfigureActivity extends Activity {
                 public void onClick(View v) {
                     final Context context = RecipeAppWidgetConfigureActivity.this;
                     Recipe recipe = (Recipe) v.getTag();
-                    toast(context, recipe.name);
+
+                    RemoteViews views = new RemoteViews(context.getPackageName(), appwidget);
+                    views.setTextViewText(R.id.appwidget_recipe_name, recipe.name);
+                    Intent serviceIntent = new Intent(context, RecipeIngredientsWidgetService.class);
+                    serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+                    serviceIntent.setData(Uri.parse(serviceIntent.toUri(Intent.URI_INTENT_SCHEME)));
+                    SharedPreferences prefs = context.getSharedPreferences(RecipeAppWidgetProvider.WIDGET_PREFS_NAME, Context.MODE_PRIVATE);
+                    prefs.edit().putInt(appWidgetId+"", recipe.recipeId).apply();
+                    views.setRemoteAdapter(R.id.appwidget_ingredients, serviceIntent);
+                    views.setEmptyView(R.id.appwidget_ingredients, R.id.appwidget_ingredients_empty);
+
                     AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-                    RecipeAppWidgetProvider.updateAppWidget(context, appWidgetManager,
-                            appWidgetId, recipe);
+                    appWidgetManager.updateAppWidget(appWidgetId, views);
 
                     Intent resultValue = new Intent();
                     resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
