@@ -1,14 +1,9 @@
 package com.lee.hansol.bakingtime.fragments;
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
@@ -24,25 +19,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.helpers.DataHelper;
+import com.lee.hansol.bakingtime.helpers.ExoPlayerHelper;
 import com.lee.hansol.bakingtime.models.Step;
 import com.lee.hansol.bakingtime.utils.User;
 
@@ -51,17 +32,12 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-import static com.lee.hansol.bakingtime.utils.LogUtils.log;
-
-public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.EventListener {
+public class RecipeStepDetailFragment extends RenewableFragment {
     private Unbinder unbinder;
     private Step step;
     private OnPrevNextButtonClickListener prevNextButtonClickListener;
-    private View rootView;
-    @Nullable private SimpleExoPlayer exoPlayer;
+    private ExoPlayerHelper playerHelper;
     public boolean isFullMode = false;
-    private int exoResumeWindow;
-    private long exoResumePosition;
     public GestureDetectorCompat gestureDetector;
 
     @BindView(R.id.fragment_recipe_step_detail_short_description) TextView shortDescriptionView;
@@ -93,49 +69,88 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_recipe_step_detail, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_recipe_step_detail, container, false);
         unbinder = ButterKnife.bind(this, rootView);
         initialize();
         return rootView;
     }
 
     private void initialize() {
-        clearExoPlayerResumePosition();
-        exitVideoFullMode();
+        playerHelper = new ExoPlayerHelper(getActivity());
+        gestureDetector = new GestureDetectorCompat(getActivity(), new SwipeListener());
+        initializeViews();
+    }
+
+    private void initializeViews() {
+        exitFullMode();
+        playerHelper.clearExoPlayerResumePosition();
         step = DataHelper.getInstance().getCurrentStepObject();
+        initializeViewContents();
+    }
+
+    public void exitFullMode() {
+        if (!isFullMode) return;
+        isFullMode = false;
+        setExoPlayerViewToNormal();
+        showAllViews();
+        setWindowToNormal();
+    }
+
+    private void setExoPlayerViewToNormal() {
+        showFullButton();
+        setVideoSizeToNormal();
+        setVideoBackgroundToNormal();
+    }
+
+    private void showFullButton() {
+        exoFullButton.setVisibility(View.VISIBLE);
+        exoFullExitButton.setVisibility(View.GONE);
+    }
+
+    private void setVideoSizeToNormal() {
+        ViewGroup.LayoutParams params = exoPlayerViewContainer.getLayoutParams();
+        params.width = 0;
+        params.height = (int) getActivity().getResources().getDimension(R.dimen.video_height);
+        exoPlayerViewContainer.setLayoutParams(params);
+    }
+
+    private void setVideoBackgroundToNormal() {
+        TypedArray array = getActivity().getTheme().obtainStyledAttributes(new int[] {
+                android.R.attr.colorBackground,
+        });
+        int backgroundColor = array.getColor(0, 0xFF00FF);
+        exoPlayerViewContainer.setBackgroundColor(backgroundColor);
+        array.recycle();
+    }
+
+    private void showAllViews() {
+        shortDescriptionView.setVisibility(View.VISIBLE);
+        descriptionView.setVisibility(View.VISIBLE);
+        previousButton.setVisibility(View.VISIBLE);
+        nextButton.setVisibility(View.VISIBLE);
+    }
+
+    private void setWindowToNormal() {
+        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+    }
+
+    private void initializeViewContents() {
         if (step != null) {
             shortDescriptionView.setText(step.shortDescription);
             descriptionView.setText(step.description);
-            setExoPlayerView();
+            setupExoPlayerView();
         }
-        gestureDetector = new GestureDetectorCompat(getActivity(), new SwipeListener());
     }
 
-    private void setExoPlayerView() {
-        if (exoPlayer != null) releaseExoPlayer();
-        if ((step.videoUrlString == null) || step.videoUrlString.isEmpty()) {
+    private void setupExoPlayerView() {
+        playerHelper.releaseExoPlayer();
+        if ((step.videoUrlString == null) || step.videoUrlString.isEmpty())
             showVideoEmptyView();
-        } else if (!User.hasInternetConnection(getActivity())) {
+        else if (!User.hasInternetConnection(getActivity()))
             showVideoUnplayableView();
-        } else {
-            initializeExoPlayerView();
+        else
             showExoPlayerView();
-        }
-    }
-
-    private void releaseExoPlayer() {
-        if (exoPlayer != null) {
-            pauseExoPlayer();
-            exoPlayer.stop();
-            exoPlayer.release();
-            log("Exoplayer released");
-        }
-        exoPlayer = null;
-    }
-
-    private void pauseExoPlayer() {
-        if ((exoPlayer != null) && (exoPlayer.getPlaybackState() == ExoPlayer.STATE_READY))
-            exoPlayer.setPlayWhenReady(false);
     }
 
     private void showVideoEmptyView() {
@@ -152,60 +167,29 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
         exoPlayerView.setVisibility(View.GONE);
     }
 
-    private void initializeExoPlayerView() {
-        initializeExoPlayer();
-        exoPlayerView.setPlayer(exoPlayer);
-    }
-
-    private void initializeExoPlayer() {
-        if (exoPlayer != null) releaseExoPlayer();
-        TrackSelector trackSelector = new DefaultTrackSelector();
-        exoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
-        String userAgent = Util.getUserAgent(getActivity(), getString(R.string.app_name));
-        Uri videoUri = Uri.parse(step.videoUrlString);
-        MediaSource mediaSource = new ExtractorMediaSource(videoUri, new DefaultDataSourceFactory(
-                getActivity(), userAgent), new DefaultExtractorsFactory(), null, null);
-
-        boolean hasResumePosition = exoResumeWindow != C.INDEX_UNSET;
-        if (hasResumePosition) {
-            exoPlayer.seekTo(exoResumeWindow, exoResumePosition);
-        }
-        exoPlayer.prepare(mediaSource);
-        exoPlayer.setPlayWhenReady(true);
-        exoPlayer.addListener(this);
-        exitVideoFullMode();
-    }
-
     private void showExoPlayerView() {
+        initializeExoPlayerView();
         brokenVideoImage.setVisibility(View.GONE);
         brokenVideoText.setVisibility(View.GONE);
         exoPlayerView.setVisibility(View.VISIBLE);
     }
 
-    private void clearExoPlayerResumePosition() {
-        exoResumeWindow = C.INDEX_UNSET;
-        exoResumePosition = C.TIME_UNSET;
+    private void initializeExoPlayerView() {
+        exitFullMode();
+        SimpleExoPlayer exoPlayer = playerHelper.getInitializedExoPlayer(step);
+        exoPlayerView.setPlayer(exoPlayer);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        pauseExoPlayer();
+        playerHelper.pauseExoPlayer();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (exoPlayer != null) {
-            updateExoPlayerResumePosition();
-            releaseExoPlayer();
-        }
-    }
-
-    private void updateExoPlayerResumePosition() {
-        exoResumeWindow = exoPlayer.getCurrentWindowIndex();
-        exoResumePosition = exoPlayer.isCurrentWindowSeekable() ? Math.max(0, exoPlayer.getCurrentPosition())
-                : C.TIME_UNSET;
+        playerHelper.updateResumePositionAndReleaseExoPlayer();
     }
 
     @Override
@@ -216,14 +200,14 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
     }
 
     private boolean needToReloadExoPlayer() {
-        return (exoPlayer == null) && (exoPlayerView.getVisibility() == View.VISIBLE);
+        return (playerHelper.getExoPlayer() == null) && (exoPlayerView.getVisibility() == View.VISIBLE);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-        clearExoPlayerResumePosition();
+        playerHelper.clearExoPlayerResumePosition();
     }
 
     @OnClick({R.id.fragment_recipe_step_detail_previous_btn, R.id.fragment_recipe_step_detail_next_btn})
@@ -236,29 +220,26 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
 
     @OnClick(R.id.exo_full)
     void onFullButtonClick() {
-        enterVideoFullMode();
+        enterFullMode();
     }
 
-    private void enterVideoFullMode() {
+    private void enterFullMode() {
         if (isFullMode) return;
         isFullMode = true;
-        showFullExitButton();
+        setExoPlayerViewToFull();
         hideAllViewsExceptVideo();
-        setVideoSizeMatchParent();
         setWindowToFullScreen();
+    }
+
+    private void setExoPlayerViewToFull() {
+        showFullExitButton();
+        setVideoSizeMatchParent();
         setVideoBackgroundToBlack();
     }
 
     private void showFullExitButton() {
         exoFullButton.setVisibility(View.GONE);
         exoFullExitButton.setVisibility(View.VISIBLE);
-    }
-
-    private void hideAllViewsExceptVideo() {
-        shortDescriptionView.setVisibility(View.GONE);
-        descriptionView.setVisibility(View.GONE);
-        previousButton.setVisibility(View.GONE);
-        nextButton.setVisibility(View.GONE);
     }
 
     private void setVideoSizeMatchParent() {
@@ -268,136 +249,31 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
         exoPlayerViewContainer.setLayoutParams(params);
     }
 
+    private void setVideoBackgroundToBlack() {
+        exoPlayerViewContainer.setBackgroundColor(Color.BLACK);
+    }
+
+    private void hideAllViewsExceptVideo() {
+        shortDescriptionView.setVisibility(View.GONE);
+        descriptionView.setVisibility(View.GONE);
+        previousButton.setVisibility(View.GONE);
+        nextButton.setVisibility(View.GONE);
+    }
+
     private void setWindowToFullScreen() {
         getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
     }
 
-    private void setVideoBackgroundToBlack() {
-        exoPlayerViewContainer.setBackgroundColor(Color.BLACK);
-    }
-
     @OnClick(R.id.exo_full_exit)
     void onFullExitButtonClick() {
-        exitVideoFullMode();
+        exitFullMode();
     }
 
-    public void exitVideoFullMode() {
-        if (!isFullMode) return;
-        isFullMode = false;
-        showFullButton();
-        showAllViews();
-        setVideoSizeToNormal();
-        setWindowToNormal();
-        setVideoBackgroundToNormal();
-    }
-
-    private void showFullButton() {
-        exoFullButton.setVisibility(View.VISIBLE);
-        exoFullExitButton.setVisibility(View.GONE);
-    }
-
-    private void showAllViews() {
-        shortDescriptionView.setVisibility(View.VISIBLE);
-        descriptionView.setVisibility(View.VISIBLE);
-        previousButton.setVisibility(View.VISIBLE);
-        nextButton.setVisibility(View.VISIBLE);
-    }
-
-    private void setVideoSizeToNormal() {
-        ViewGroup.LayoutParams params = exoPlayerViewContainer.getLayoutParams();
-        params.width = 0;
-        params.height = (int) getActivity().getResources().getDimension(R.dimen.video_height);
-        exoPlayerViewContainer.setLayoutParams(params);
-    }
-
-    private void setWindowToNormal() {
-        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
-    }
-
-    private void setVideoBackgroundToNormal() {
-        TypedArray array = getActivity().getTheme().obtainStyledAttributes(new int[] {
-                android.R.attr.colorBackground,
-        });
-        int backgroundColor = array.getColor(0, 0xFF00FF);
-        exoPlayerViewContainer.setBackgroundColor(backgroundColor);
-        array.recycle();
-    }
-
-    public void slideLeftRenewSlideRightEnter() {
-        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        Animator slideLeft = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_left_exit);
-        slideLeft.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                initialize();
-                animation.removeAllListeners();
-                slideRightEnter();
-            }
-        });
-        slideLeft.setTarget(rootView);
-        slideLeft.start();
-    }
-
-    private void slideRightEnter() {
-        Animator slideRightEnter = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_right_enter);
-        slideRightEnter.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                animation.removeAllListeners();
-            }
-        });
-        slideRightEnter.setTarget(rootView);
-        slideRightEnter.start();
-    }
-
-    public void slideRightRenewSlideRightEnter() {
-        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        Animator slideRight = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_right_exit);
-        slideRight.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                initialize();
-                animation.removeAllListeners();
-                slideRightEnter();
-            }
-        });
-        slideRight.setTarget(rootView);
-        slideRight.start();
-    }
-
-    public void slideLeftRenewSlideLeftEnter() {
-        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        Animator slideLeft = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_left_exit);
-        slideLeft.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                initialize();
-                animation.removeAllListeners();
-                slideLeftEnter();
-            }
-        });
-        slideLeft.setTarget(rootView);
-        slideLeft.start();
-    }
-
-    private void slideLeftEnter() {
-        Animator slideLeftEnter = AnimatorInflater.loadAnimator(getActivity(), R.animator.fragment_slide_left_enter);
-        slideLeftEnter.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                animation.removeAllListeners();
-            }
-        });
-        slideLeftEnter.setTarget(rootView);
-        slideLeftEnter.start();
+    @Override
+    public void renew() {
+        initializeViews();
     }
 
     @Override
@@ -405,19 +281,19 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
         super.onConfigurationChanged(newConfig);
 
         if (turnsLandscapeWhilstVideoNotFullMode(newConfig))
-            enterVideoFullMode();
+            enterFullMode();
         else if (turnsPortraitWhilstVideoFullMode(newConfig))
-            exitVideoFullMode();
+            exitFullMode();
     }
 
     private boolean turnsLandscapeWhilstVideoNotFullMode(Configuration newConfig) {
-        return (exoPlayer != null)
+        return (playerHelper.getExoPlayer() != null)
                 && (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
                 && !isFullMode;
     }
 
     private boolean turnsPortraitWhilstVideoFullMode(Configuration newConfig) {
-        return (exoPlayer != null)
+        return (playerHelper.getExoPlayer() != null)
                 && (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)
                 && isFullMode;
     }
@@ -440,43 +316,5 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
 
     private void swipeLeft() {
         prevNextButtonClickListener.onPrevButtonClicked();
-    }
-
-    @Override
-    public void onTimelineChanged(Timeline timeline, Object manifest) {
-
-    }
-
-    @Override
-    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
-    }
-
-    @Override
-    public void onLoadingChanged(boolean isLoading) {
-
-    }
-
-    @Override
-    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        if (playbackState == ExoPlayer.STATE_ENDED) {
-            if (exoPlayer != null)
-                exoPlayer.setPlayWhenReady(false);
-        }
-    }
-
-    @Override
-    public void onPlayerError(ExoPlaybackException error) {
-
-    }
-
-    @Override
-    public void onPositionDiscontinuity() {
-
-    }
-
-    @Override
-    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-
     }
 }

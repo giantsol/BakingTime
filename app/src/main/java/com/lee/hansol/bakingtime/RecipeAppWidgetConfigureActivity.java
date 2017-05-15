@@ -16,10 +16,12 @@ import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.helpers.DataHelper;
 import com.lee.hansol.bakingtime.models.Recipe;
+import com.lee.hansol.bakingtime.utils.DataUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.lee.hansol.bakingtime.utils.DataUtils.loadRecipesFromDb;
 import static com.lee.hansol.bakingtime.utils.ToastUtils.toast;
 
 public class RecipeAppWidgetConfigureActivity extends Activity {
@@ -43,7 +45,7 @@ public class RecipeAppWidgetConfigureActivity extends Activity {
         if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish();
         }
-        Recipe[] recipes = DataHelper.getInstance().loadRecipesFromDb(this);
+        Recipe[] recipes = DataUtils.loadRecipesFromDb(this);
         WidgetConfigureRecipesAdapter adapter = new WidgetConfigureRecipesAdapter(this, recipes);
         listView.setAdapter(adapter);
     }

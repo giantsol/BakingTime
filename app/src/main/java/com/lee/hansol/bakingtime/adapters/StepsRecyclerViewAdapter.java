@@ -67,12 +67,16 @@ public class StepsRecyclerViewAdapter
                 context.getString(R.string.text_step_placeholder),
                 step.stepOrder, step.shortDescription);
         holder.textView.setText(text);
+        holder.itemView.setBackgroundColor(getNormalBackgroundColor());
+    }
+
+    private int getNormalBackgroundColor() {
         TypedArray array = context.getTheme().obtainStyledAttributes(new int[] {
                 android.R.attr.colorBackground,
         });
         int backgroundColor = array.getColor(0, 0xFF00FF);
-        holder.itemView.setBackgroundColor(backgroundColor);
         array.recycle();
+        return backgroundColor;
     }
 
     @Override

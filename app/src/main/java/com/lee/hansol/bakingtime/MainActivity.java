@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private void initialize() {
         initializeMainRecyclerView();
-        loadRecipes();
+        startLoaderForRecipes();
     }
 
     private void initializeMainRecyclerView() {
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mainRecyclerView.setAdapter(recipesAdapter);
     }
 
-    private void loadRecipes() {
+    private void startLoaderForRecipes() {
         Loader<Recipe[]> loader = getSupportLoaderManager().getLoader(LOADER_ID_LOAD_RECIPES);
         if (loader == null) getSupportLoaderManager().initLoader(LOADER_ID_LOAD_RECIPES, null, this);
         else getSupportLoaderManager().restartLoader(LOADER_ID_LOAD_RECIPES, null, this);

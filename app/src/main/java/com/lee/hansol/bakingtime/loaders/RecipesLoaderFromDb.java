@@ -5,8 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.AsyncTaskLoader;
 
 import com.lee.hansol.bakingtime.R;
-import com.lee.hansol.bakingtime.helpers.DataHelper;
 import com.lee.hansol.bakingtime.models.Recipe;
+import com.lee.hansol.bakingtime.utils.DataUtils;
 
 import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
@@ -28,7 +28,7 @@ public class RecipesLoaderFromDb extends AsyncTaskLoader<Recipe[]> {
     @NonNull
     public Recipe[] loadInBackground() {
         log(R.string.log_load_in_background_from_db_loader);
-        return DataHelper.getInstance().loadRecipesFromDb(getContext());
+        return DataUtils.loadRecipesFromDb(getContext());
     }
 
     @Override
