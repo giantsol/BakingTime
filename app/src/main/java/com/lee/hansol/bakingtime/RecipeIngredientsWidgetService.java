@@ -15,6 +15,8 @@ import com.lee.hansol.bakingtime.models.Ingredient;
 import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.utils.DbUtils;
 
+import java.util.Locale;
+
 import static com.lee.hansol.bakingtime.utils.ToastUtils.toast;
 
 public class RecipeIngredientsWidgetService extends RemoteViewsService {
@@ -71,8 +73,12 @@ class RecipeIngredientsRemoteViewsFactory implements RemoteViewsService.RemoteVi
 
     @Override
     public RemoteViews getViewAt(int position) {
+        Ingredient ingredient = ingredients[position];
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ingredient_list_item);
-        views.setTextViewText(R.id.ingredient_list_item_text, ingredients[position].name);
+        String text = String.format(Locale.getDefault(),
+                context.getString(R.string.text_ingredient_placeholder),
+                position + 1, ingredient.name, ingredient.quantity, ingredient.measureUnit);
+        views.setTextViewText(R.id.ingredient_list_item_text, text);
         return views;
     }
 
