@@ -332,10 +332,10 @@ public class RecipeDetailActivity extends AppCompatActivity
         return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (isStepDetailFragmentVisible && (stepDetailFragment.gestureDetector != null))
-            stepDetailFragment.gestureDetector.onTouchEvent(ev);
-        return super.dispatchTouchEvent(ev);
-    }
+//    @Override
+//    public boolean dispatchTouchEvent(MotionEvent ev) {
+//        if (isStepDetailFragmentVisible && (stepDetailFragment.gestureDetector != null))
+//            stepDetailFragment.gestureDetector.onTouchEvent(ev);
+//        return super.dispatchTouchEvent(ev);
+//    }
 }

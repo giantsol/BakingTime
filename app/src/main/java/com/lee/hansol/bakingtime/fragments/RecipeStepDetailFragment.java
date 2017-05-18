@@ -33,13 +33,15 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public class RecipeStepDetailFragment extends RenewableFragment {
+import static com.lee.hansol.bakingtime.utils.LogUtils.log;
+
+public class RecipeStepDetailFragment extends RenewableFragment implements View.OnTouchListener {
     private Unbinder unbinder;
     private Step step;
     private OnPrevNextButtonClickListener prevNextButtonClickListener;
     private ExoPlayerHelper playerHelper;
     public boolean isFullMode = false;
-    public GestureDetectorCompat gestureDetector;
+    private GestureDetectorCompat gestureDetector;
     private int swipeThreshold;
 
     @BindView(R.id.fragment_recipe_step_detail_short_description) TextView shortDescriptionView;
@@ -73,6 +75,7 @@ public class RecipeStepDetailFragment extends RenewableFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_recipe_step_detail, container, false);
         unbinder = ButterKnife.bind(this, rootView);
+        rootView.setOnTouchListener(this);
         initialize();
         return rootView;
     }
@@ -307,6 +310,12 @@ public class RecipeStepDetailFragment extends RenewableFragment {
         return (playerHelper.getExoPlayer() != null)
                 && (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)
                 && isFullMode;
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        gestureDetector.onTouchEvent(event);
+        return true;
     }
 
     private class SwipeListener extends GestureDetector.SimpleOnGestureListener {
