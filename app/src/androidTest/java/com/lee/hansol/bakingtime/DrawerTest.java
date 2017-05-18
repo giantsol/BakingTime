@@ -4,20 +4,19 @@ import android.support.test.filters.SmallTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.google.android.exoplayer2.upstream.DataSource;
 import com.lee.hansol.bakingtime.helpers.DataStorage;
 import com.lee.hansol.bakingtime.utils.DataUtils;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 @RunWith(AndroidJUnit4.class)
@@ -34,8 +33,11 @@ public class DrawerTest {
     }
 
     @Test
-    public void clickStepItem_showDetailFragmentOnRight() {
+    public void clickStepItem_showDetailFragment() {
         onView(withId(R.id.fragment_recipe_step_list_steps_view))
                 .perform(actionOnItemAtPosition(0, click()));
+
+        onView(withId(R.id.fragment_recipe_step_detail_short_description))
+                .check(matches(isDisplayed()));
     }
 }
