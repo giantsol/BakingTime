@@ -19,7 +19,6 @@ public class RecipesLoaderFromDb extends AsyncTaskLoader<Recipe[]> {
 
     @Override
     protected void onStartLoading() {
-        log(R.string.log_on_start_loading_from_db_loader);
         if (recipes != null) deliverResult(recipes);
         else forceLoad();
     }
@@ -27,13 +26,11 @@ public class RecipesLoaderFromDb extends AsyncTaskLoader<Recipe[]> {
     @Override
     @NonNull
     public Recipe[] loadInBackground() {
-        log(R.string.log_load_in_background_from_db_loader);
         return DataUtils.loadRecipesFromDb(getContext());
     }
 
     @Override
     public void deliverResult(@NonNull Recipe[] data) {
-        log(R.string.log_deliver_result_from_db_loader);
         recipes = data;
         super.deliverResult(data);
     }

@@ -10,6 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.adapters.RecipesRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.helpers.DataHelper;
@@ -35,20 +38,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private final int LOADER_ID_LOAD_RECIPES = 111;
 
     @BindView(R.id.activity_main_recyclerview) RecyclerView mainRecyclerView;
+    @BindView(R.id.activity_main_progressbar) ProgressBar progressBar;
+    @BindView(R.id.activity_main_error_textview) TextView errorTextView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        LogUtils.setContext(this);
-
         initialize();
     }
 
     private void initialize() {
+        initializeViewVisibilities();
         initializeMainRecyclerView();
         startLoaderForRecipes();
+    }
+
+    private void initializeViewVisibilities() {
+        mainRecyclerView.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
+        errorTextView.setVisibility(View.INVISIBLE);
     }
 
     private void initializeMainRecyclerView() {
@@ -61,9 +71,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void startLoaderForRecipes() {
+        showOnlyProgressBar();
         Loader<Recipe[]> loader = getSupportLoaderManager().getLoader(LOADER_ID_LOAD_RECIPES);
         if (loader == null) getSupportLoaderManager().initLoader(LOADER_ID_LOAD_RECIPES, null, this);
         else getSupportLoaderManager().restartLoader(LOADER_ID_LOAD_RECIPES, null, this);
+    }
+
+    private void showOnlyProgressBar() {
+        mainRecyclerView.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+        errorTextView.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -76,11 +93,36 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Recipe[]> loader, @NonNull Recipe[] recipes) {
-        log(String.format(Locale.getDefault(),
-                getString(R.string.log_number_of_recipes_loaded_placeholder),
-                recipes.length));
-        DataHelper.getInstance().setRecipes(recipes);
-        recipesAdapter.notifyDataSetChanged();
+        if (recipes.length == 0)
+            if (loader instanceof RecipesLoaderFromInternet)
+                showErrorWhileLoadingFromInternet();
+            else
+                showErrorWhileLoadingFromDb();
+        else {
+            DataHelper.getInstance().setRecipes(recipes);
+            recipesAdapter.notifyDataSetChanged();
+            showRecipesView();
+        }
+    }
+
+    private void showErrorWhileLoadingFromInternet() {
+        mainRecyclerView.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
+        errorTextView.setVisibility(View.VISIBLE);
+        errorTextView.setText(getString(R.string.text_error_loading_from_internet));
+    }
+
+    private void showErrorWhileLoadingFromDb() {
+        mainRecyclerView.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
+        errorTextView.setVisibility(View.VISIBLE);
+        errorTextView.setText(getString(R.string.text_error_loading_from_db));
+    }
+
+    private void showRecipesView() {
+        mainRecyclerView.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
+        errorTextView.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -106,8 +148,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    protected void onDestroy() {
-        LogUtils.setContext(null);
-        super.onDestroy();
+    protected void onStart() {
+        super.onStart();
+        LogUtils.setContext(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (isFinishing()) LogUtils.setContext(null);
     }
 }

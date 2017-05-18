@@ -20,7 +20,6 @@ public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
 
     @Override
     protected void onStartLoading() {
-        log(R.string.log_on_start_loading_from_internet_loader);
         if (recipes != null) deliverResult(recipes);
         else forceLoad();
     }
@@ -28,14 +27,10 @@ public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
     @Override
     @NonNull
     public Recipe[] loadInBackground() {
-        log(R.string.log_load_in_background_from_internet_loader);
         String urlString = getContext().getString(R.string.url_baking_recipe);
         try {
             Recipe[] recipes = DataUtils.loadRecipesFromUrl(getContext(), urlString);
-            int insertedRowNum = DataUtils.saveRecipesToDb(getContext(), recipes);
-            log(String.format(Locale.getDefault(),
-                    getContext().getString(R.string.log_inserted_row_count_placeholder),
-                    insertedRowNum));
+            DataUtils.saveRecipesToDb(getContext(), recipes);
             return recipes;
         } catch (Exception e) {
             e.printStackTrace();
@@ -45,7 +40,6 @@ public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
 
     @Override
     public void deliverResult(@NonNull Recipe[] data) {
-        log(R.string.log_deliver_result_from_internet_loader);
         recipes = data;
         super.deliverResult(data);
     }
