@@ -10,7 +10,7 @@ import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.models.Ingredient;
 import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.utils.DataUtils;
-import com.lee.hansol.bakingtime.utils.SharedPreferencesUtils;
+import com.lee.hansol.bakingtime.utils.PrefUtils;
 
 import java.util.Locale;
 
@@ -35,7 +35,7 @@ public class RecipeIngredientsWidgetService extends RemoteViewsService {
 
         @Override
         public void onCreate() {
-            int recipeId = SharedPreferencesUtils.getInt(context, appwidgetId, 0);
+            int recipeId = PrefUtils.getInt(context, appwidgetId, 0);
             Recipe recipe = DataUtils.getRecipeObjectWithRecipeId(context, recipeId);
             if (recipe != null) ingredients = recipe.ingredients;
         }

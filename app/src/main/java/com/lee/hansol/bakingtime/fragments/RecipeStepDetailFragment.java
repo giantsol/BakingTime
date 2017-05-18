@@ -22,7 +22,7 @@ import android.widget.TextView;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.lee.hansol.bakingtime.R;
-import com.lee.hansol.bakingtime.helpers.DataHelper;
+import com.lee.hansol.bakingtime.helpers.DataStorage;
 import com.lee.hansol.bakingtime.helpers.ExoPlayerHelper;
 import com.lee.hansol.bakingtime.models.Step;
 import com.lee.hansol.bakingtime.utils.User;
@@ -84,7 +84,7 @@ public class RecipeStepDetailFragment extends RenewableFragment {
     private void initializeViews() {
         exitFullMode();
         playerHelper.clearExoPlayerResumePosition();
-        step = DataHelper.getInstance().getCurrentStepObject();
+        step = DataStorage.getInstance().getCurrentStepObject();
         initializeViewContents();
     }
 

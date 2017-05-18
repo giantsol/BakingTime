@@ -7,13 +7,13 @@ import com.lee.hansol.bakingtime.models.Ingredient;
 import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.models.Step;
 
-public final class DataHelper {
-    private static DataHelper singletonSelf;
-    public static DataHelper getInstance() {
-        if (singletonSelf == null) singletonSelf = new DataHelper();
+public final class DataStorage {
+    private static DataStorage singletonSelf;
+    public static DataStorage getInstance() {
+        if (singletonSelf == null) singletonSelf = new DataStorage();
         return singletonSelf;
     }
-    private DataHelper(){}
+    private DataStorage(){}
 
     @NonNull private Recipe[] recipes = new Recipe[0];
     @NonNull private Ingredient[] ingredients = new Ingredient[0];

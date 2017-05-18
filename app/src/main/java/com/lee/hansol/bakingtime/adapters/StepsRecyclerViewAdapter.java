@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.R;
-import com.lee.hansol.bakingtime.helpers.DataHelper;
+import com.lee.hansol.bakingtime.helpers.DataStorage;
 import com.lee.hansol.bakingtime.models.Step;
 
 import java.util.Locale;
@@ -45,9 +45,9 @@ public class StepsRecyclerViewAdapter
 
     @Override
     public void onBindViewHolder(StepViewHolder holder, int position) {
-        Step step = DataHelper.getInstance().getStepObjectAt(position);
+        Step step = DataStorage.getInstance().getStepObjectAt(position);
         if (step != null) {
-            if (step == DataHelper.getInstance().getCurrentStepObject())
+            if (step == DataStorage.getInstance().getCurrentStepObject())
                 setCurrentStepView(holder, step);
             else
                 setOtherStepView(holder, step);
@@ -81,7 +81,7 @@ public class StepsRecyclerViewAdapter
 
     @Override
     public int getItemCount() {
-        return DataHelper.getInstance().getAllSteps().length;
+        return DataStorage.getInstance().getAllSteps().length;
     }
 
     class StepViewHolder extends RecyclerView.ViewHolder {

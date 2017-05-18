@@ -13,6 +13,8 @@
     <dimen name="textsize_bigger">18sp</dimen>
     <dimen name="textsize_big">24sp</dimen>
     <dimen name="textsize_very_big">30sp</dimen>
+    <dimen name="textsize_header">40sp</dimen>
+    <dimen name="textsize_subheader">20sp</dimen>
 
     <dimen name="shadow_height">10dp</dimen>
     <dimen name="sliding_panel_height">80dp</dimen>
@@ -21,4 +23,5 @@
 
     <dimen name="video_height">300dp</dimen>
 
+    <dimen name="recipe_card_height">200dp</dimen>
 </resources>

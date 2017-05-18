@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.adapters.IngredientsRecyclerViewAdapter;
 import com.lee.hansol.bakingtime.adapters.StepsRecyclerViewAdapter;
-import com.lee.hansol.bakingtime.helpers.DataHelper;
+import com.lee.hansol.bakingtime.helpers.DataStorage;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import butterknife.BindView;
@@ -109,8 +109,8 @@ public class RecipeStepListFragment extends RenewableFragment {
     }
 
     private void scrollToWhereItShouldBe() {
-        if (DataHelper.getInstance().getCurrentStepIndex() != -1)
-            stepsRecyclerView.scrollToPosition(DataHelper.getInstance().getCurrentStepIndex());
+        if (DataStorage.getInstance().getCurrentStepIndex() != -1)
+            stepsRecyclerView.scrollToPosition(DataStorage.getInstance().getCurrentStepIndex());
         else
             stepsRecyclerView.scrollToPosition(0);
     }

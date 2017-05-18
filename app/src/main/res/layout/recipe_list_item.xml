@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/recipe_list_item_parent"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
+    android:layout_height="@dimen/recipe_card_height"
     app:cardElevation="1dp"
     app:cardMaxElevation="4dp"
     app:cardUseCompatPadding="true">
@@ -26,8 +26,7 @@
             app:layout_constraintBottom_toTopOf="parent"
             app:layout_constraintLeft_toRightOf="parent"
             app:layout_constraintRight_toLeftOf="parent"
-            tools:text="Name of recipe"
-            style="@style/h1TextStyle"/>
+            style="@style/recipeHeaderNameTextStyle"/>
         <TextView
             android:id="@+id/recipe_list_item_servings"
             android:layout_width="wrap_content"
@@ -35,8 +34,6 @@
             app:layout_constraintTop_toBottomOf="@id/recipe_list_item_name"
             app:layout_constraintRight_toLeftOf="parent"
             app:layout_constraintLeft_toRightOf="parent"
-            android:layout_marginTop="@dimen/spacing_small"
-            tools:text="8 people"
-            style="@style/h2TextStyle"/>
+            style="@style/recipeServingsTextStyle"/>
     </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>

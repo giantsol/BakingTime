@@ -8,12 +8,13 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="h1TextStyle">
-        <item name="android:textSize">@dimen/textsize_very_big</item>
+    <style name="recipeHeaderNameTextStyle">
+        <item name="android:textSize">@dimen/textsize_header</item>
         <item name="android:textColor">@android:color/black</item>
     </style>
-    <style name="h2TextStyle">
-        <item name="android:textSize">@dimen/textsize_big</item>
+    <style name="recipeServingsTextStyle">
+        <item name="android:layout_marginTop">@dimen/spacing_small</item>
+        <item name="android:textSize">@dimen/textsize_subheader</item>
         <item name="android:textColor">@android:color/black</item>
     </style>
     <style name="normalTextStyle">

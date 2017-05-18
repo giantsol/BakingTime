@@ -1,7 +1,6 @@
 package com.lee.hansol.bakingtime.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.R;
-import com.lee.hansol.bakingtime.helpers.DataHelper;
+import com.lee.hansol.bakingtime.helpers.DataStorage;
 import com.lee.hansol.bakingtime.models.Ingredient;
 
 import java.util.Locale;
@@ -31,7 +30,7 @@ public class IngredientsRecyclerViewAdapter
 
     @Override
     public void onBindViewHolder(IngredientViewHolder holder, int position) {
-        Ingredient ingredient = DataHelper.getInstance().getIngredientObjectAt(position);
+        Ingredient ingredient = DataStorage.getInstance().getIngredientObjectAt(position);
         if (ingredient != null) {
             String text = String.format(Locale.getDefault(),
                     context.getString(R.string.text_ingredient_placeholder),
@@ -42,7 +41,7 @@ public class IngredientsRecyclerViewAdapter
 
     @Override
     public int getItemCount() {
-        return DataHelper.getInstance().getAllIngredients().length;
+        return DataStorage.getInstance().getAllIngredients().length;
     }
 
     class IngredientViewHolder extends RecyclerView.ViewHolder {

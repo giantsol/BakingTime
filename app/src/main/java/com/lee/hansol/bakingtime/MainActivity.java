@@ -15,14 +15,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.adapters.RecipesRecyclerViewAdapter;
-import com.lee.hansol.bakingtime.helpers.DataHelper;
+import com.lee.hansol.bakingtime.helpers.DataStorage;
 import com.lee.hansol.bakingtime.loaders.RecipesLoaderFromDb;
 import com.lee.hansol.bakingtime.loaders.RecipesLoaderFromInternet;
 import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.utils.LogUtils;
 import com.lee.hansol.bakingtime.utils.User;
-
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -99,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             else
                 showErrorWhileLoadingFromDb();
         else {
-            DataHelper.getInstance().setRecipes(recipes);
+            DataStorage.getInstance().setRecipes(recipes);
             recipesAdapter.notifyDataSetChanged();
             showRecipesView();
         }
@@ -132,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onRecipeItemClick(int recipeIndex) {
-        DataHelper.getInstance().setCurrentRecipeIndex(recipeIndex);
+        DataStorage.getInstance().setCurrentRecipeIndex(recipeIndex);
         startRecipeDetailActivity();
     }
 

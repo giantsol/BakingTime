@@ -2,7 +2,6 @@ package com.lee.hansol.bakingtime.adapters;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.R;
-import com.lee.hansol.bakingtime.helpers.DataHelper;
+import com.lee.hansol.bakingtime.helpers.DataStorage;
 import com.lee.hansol.bakingtime.models.Recipe;
 
 import butterknife.BindView;
@@ -41,8 +40,8 @@ public class DrawerRecyclerViewAdapter
 
     @Override
     public void onBindViewHolder(ItemViewHolder holder, int position) {
-        Recipe recipe = DataHelper.getInstance().getRecipeObjectAt(position);
-        if (DataHelper.getInstance().getCurrentRecipeObject() == recipe) {
+        Recipe recipe = DataStorage.getInstance().getRecipeObjectAt(position);
+        if (DataStorage.getInstance().getCurrentRecipeObject() == recipe) {
             setCurrentRecipeView(holder, recipe);
         } else {
             setOtherRecipeView(holder, recipe);
@@ -69,7 +68,7 @@ public class DrawerRecyclerViewAdapter
 
     @Override
     public int getItemCount() {
-        return DataHelper.getInstance().getAllRecipes().length;
+        return DataStorage.getInstance().getAllRecipes().length;
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {

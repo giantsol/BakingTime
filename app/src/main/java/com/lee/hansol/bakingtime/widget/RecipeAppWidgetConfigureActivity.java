@@ -17,7 +17,7 @@ import android.widget.TextView;
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.utils.DataUtils;
-import com.lee.hansol.bakingtime.utils.SharedPreferencesUtils;
+import com.lee.hansol.bakingtime.utils.PrefUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -110,7 +110,7 @@ public class RecipeAppWidgetConfigureActivity extends Activity {
         public void onClick(View v) {
             Recipe recipe = (Recipe) v.getTag();
             final Context context = getContext();
-            SharedPreferencesUtils.putInt(context, appWidgetId, recipe.recipeId);
+            PrefUtils.putInt(context, appWidgetId, recipe.recipeId);
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             RecipeAppWidgetProvider.updateAppWidget(context, appWidgetManager, appWidgetId);
 

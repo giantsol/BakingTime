@@ -11,7 +11,7 @@ import android.widget.RemoteViews;
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.utils.DataUtils;
-import com.lee.hansol.bakingtime.utils.SharedPreferencesUtils;
+import com.lee.hansol.bakingtime.utils.PrefUtils;
 
 public class RecipeAppWidgetProvider extends AppWidgetProvider {
 
@@ -23,7 +23,7 @@ public class RecipeAppWidgetProvider extends AppWidgetProvider {
     }
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
-        int recipeId = SharedPreferencesUtils.getInt(context, appWidgetId, 0);
+        int recipeId = PrefUtils.getInt(context, appWidgetId, 0);
         Recipe recipe = DataUtils.getRecipeObjectWithRecipeId(context, recipeId);
         RemoteViews views = (recipe != null)
                 ? getViewsForRecipe(context, recipe, appWidgetId)

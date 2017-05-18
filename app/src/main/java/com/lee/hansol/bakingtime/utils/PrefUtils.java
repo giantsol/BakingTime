@@ -3,7 +3,7 @@ package com.lee.hansol.bakingtime.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class SharedPreferencesUtils {
+public class PrefUtils {
     private static final String PREFERENCES_FILE_NAME = "baking_prefs";
 
     public static void putInt(Context context, String key, int value) {

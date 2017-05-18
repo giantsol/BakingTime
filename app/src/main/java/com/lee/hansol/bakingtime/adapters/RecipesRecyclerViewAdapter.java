@@ -2,8 +2,8 @@ package com.lee.hansol.bakingtime.adapters;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
-import android.database.DatabaseErrorHandler;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,8 +13,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lee.hansol.bakingtime.R;
-import com.lee.hansol.bakingtime.helpers.DataHelper;
+import com.lee.hansol.bakingtime.helpers.DataStorage;
 import com.lee.hansol.bakingtime.models.Recipe;
+import com.squareup.picasso.Picasso;
 
 import java.util.Locale;
 
@@ -40,28 +41,13 @@ public class RecipesRecyclerViewAdapter extends RecyclerView.Adapter<RecipesRecy
         this.recipeItemClickAnimator.addListener(recipeItemClickAnimatorListener);
     }
 
-    private class RecipeItemClickAnimatorListener implements Animator.AnimatorListener {
+    private class RecipeItemClickAnimatorListener extends AnimatorListenerAdapter {
         int clickedItemIndex = 0;
-
-        @Override
-        public void onAnimationStart(Animator animation) {
-
-        }
-
         @Override
         public void onAnimationEnd(Animator animation) {
             recipeItemClickListener.onRecipeItemClick(clickedItemIndex);
         }
 
-        @Override
-        public void onAnimationCancel(Animator animation) {
-
-        }
-
-        @Override
-        public void onAnimationRepeat(Animator animation) {
-
-        }
     }
 
     @Override
@@ -72,19 +58,26 @@ public class RecipesRecyclerViewAdapter extends RecyclerView.Adapter<RecipesRecy
 
     @Override
     public void onBindViewHolder(RecipeViewHolder holder, int position) {
-        Recipe recipe = DataHelper.getInstance().getRecipeObjectAt(position);
+        Recipe recipe = DataStorage.getInstance().getRecipeObjectAt(position);
         if (recipe != null) {
             holder.name.setText(recipe.name);
             holder.servings.setText(String.format(Locale.getDefault(),
                     context.getString(R.string.text_servings_placeholder),
                     recipe.servings));
-            holder.image.setBackgroundResource(R.drawable.ic_assignment_ind_black_24dp);
+            setImageView(holder.image, recipe.imageUrlString);
         }
+    }
+
+    private void setImageView(ImageView imageView, String imageUrlString) {
+        if (imageUrlString.equals(""))
+            Picasso.with(context).load(R.drawable.no_image).into(imageView);
+        else
+            Picasso.with(context).load(imageUrlString).error(R.drawable.no_image).into(imageView);
     }
 
     @Override
     public int getItemCount() {
-        return DataHelper.getInstance().getAllRecipes().length;
+        return DataStorage.getInstance().getAllRecipes().length;
     }
 
     class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

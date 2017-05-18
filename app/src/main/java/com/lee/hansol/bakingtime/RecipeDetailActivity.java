@@ -20,14 +20,13 @@ import com.lee.hansol.bakingtime.fragments.RecipeStepDetailFragment;
 import com.lee.hansol.bakingtime.fragments.RecipeStepListFragment;
 import com.lee.hansol.bakingtime.helpers.ActionBarHelper;
 import com.lee.hansol.bakingtime.helpers.AnimationHelper;
-import com.lee.hansol.bakingtime.helpers.DataHelper;
+import com.lee.hansol.bakingtime.helpers.DataStorage;
 import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.utils.User;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static android.R.attr.action;
 import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 public class RecipeDetailActivity extends AppCompatActivity
@@ -73,7 +72,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void setActionBarTitleToCurrentRecipe() {
-        Recipe currentRecipe = DataHelper.getInstance().getCurrentRecipeObject();
+        Recipe currentRecipe = DataStorage.getInstance().getCurrentRecipeObject();
         actionBarHelper.setTitleToRecipeName(currentRecipe);
     }
 
@@ -165,7 +164,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void changeRecipe(int recipeIndex) {
-        DataHelper.getInstance().setCurrentRecipeIndex(recipeIndex);
+        DataStorage.getInstance().setCurrentRecipeIndex(recipeIndex);
         closeDrawerAndShowNewRecipeDetail();
     }
 
@@ -245,7 +244,7 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     @Override
     public void onStepItemClick(int stepIndex) {
-        DataHelper.getInstance().setCurrentStepIndex(stepIndex);
+        DataStorage.getInstance().setCurrentStepIndex(stepIndex);
         if (User.isTablet(this)) {
             showStepDetailFragmentInRightPanel();
             stepListFragment.renew();
@@ -276,8 +275,8 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     @Override
     public void onPrevButtonClicked() {
-        if (DataHelper.getInstance().hasPreviousStep()) {
-            DataHelper.getInstance().moveToPreviousStep();
+        if (DataStorage.getInstance().hasPreviousStep()) {
+            DataStorage.getInstance().moveToPreviousStep();
             animationHelper.slideRightExitRenewSlideRightEnter(stepDetailFragment);
             if (User.isTablet(this))
                 stepListFragment.renew();
@@ -292,8 +291,8 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     @Override
     public void onNextButtonClicked() {
-        if (DataHelper.getInstance().hasNextStep()) {
-            DataHelper.getInstance().moveToNextStep();
+        if (DataStorage.getInstance().hasNextStep()) {
+            DataStorage.getInstance().moveToNextStep();
             animationHelper.slideLeftExitRenewSlideLeftEnter(stepDetailFragment);
             if (User.isTablet(this))
                 stepListFragment.renew();
