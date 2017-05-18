@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.helpers.DataStorage;
 import com.lee.hansol.bakingtime.models.Step;
+import com.lee.hansol.bakingtime.utils.StringUtils;
 
 import java.util.Locale;
 
@@ -55,10 +56,7 @@ public class StepsRecyclerViewAdapter
     }
 
     private void setCurrentStepView(StepViewHolder holder, @NonNull Step step) {
-        String text = String.format(Locale.getDefault(),
-                context.getString(R.string.text_step_placeholder),
-                step.stepOrder, step.shortDescription);
-        holder.textView.setText(text);
+        holder.textView.setText(StringUtils.getStepShortDescText(context, step));
         holder.itemView.setBackgroundResource(R.color.selectedItemColor);
     }
 

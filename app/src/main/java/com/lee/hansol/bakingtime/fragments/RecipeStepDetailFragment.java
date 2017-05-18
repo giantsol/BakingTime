@@ -25,6 +25,7 @@ import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.helpers.DataStorage;
 import com.lee.hansol.bakingtime.helpers.ExoPlayerHelper;
 import com.lee.hansol.bakingtime.models.Step;
+import com.lee.hansol.bakingtime.utils.StringUtils;
 import com.lee.hansol.bakingtime.utils.User;
 
 import butterknife.BindView;
@@ -137,7 +138,7 @@ public class RecipeStepDetailFragment extends RenewableFragment {
 
     private void initializeViewContents() {
         if (step != null) {
-            shortDescriptionView.setText(step.shortDescription);
+            shortDescriptionView.setText(StringUtils.getStepShortDescText(getActivity(), step));
             descriptionView.setText(step.description);
             setupExoPlayerView();
         }

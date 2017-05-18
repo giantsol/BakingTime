@@ -109,10 +109,12 @@ public class RecipeStepListFragment extends RenewableFragment {
     }
 
     private void scrollToWhereItShouldBe() {
-        if (DataStorage.getInstance().getCurrentStepIndex() != -1)
-            stepsRecyclerView.scrollToPosition(DataStorage.getInstance().getCurrentStepIndex());
-        else
-            stepsRecyclerView.scrollToPosition(0);
+        int index = DataStorage.getInstance().getCurrentStepIndex();
+        if (index != -1) {
+            index -= 2;
+            if (index < 0) index = 0;
+            stepsRecyclerView.scrollToPosition(index);
+        } else stepsRecyclerView.scrollToPosition(0);
     }
 
     public void closeSlider() {

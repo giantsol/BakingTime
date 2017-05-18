@@ -2,7 +2,6 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
@@ -16,10 +15,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            android:padding="@dimen/spacing_normal"
-            android:textSize="@dimen/textsize_bigger"
-            android:gravity="center"
-            tools:text="short description"/>
+            style="@style/stepDetailShortDescTextStyle"/>
         <RelativeLayout
             android:id="@+id/fragment_recipe_step_detail_exoplayerview_container"
             android:layout_width="0dp"
@@ -55,8 +51,7 @@
             app:layout_constraintTop_toBottomOf="@id/fragment_recipe_step_detail_exoplayerview_container"
             app:layout_constraintRight_toLeftOf="parent"
             app:layout_constraintLeft_toRightOf="parent"
-            android:layout_marginTop="@dimen/spacing_big"
-            tools:text="Description blah blah blahblah"/>
+            style="@style/stepDetailLongDescTextStyle"/>
         <Button
             android:id="@+id/fragment_recipe_step_detail_previous_btn"
             android:layout_width="wrap_content"
@@ -64,12 +59,9 @@
             app:layout_constraintTop_toBottomOf="@id/fragment_recipe_step_detail_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            android:layout_marginBottom="@dimen/spacing_normal"
-            android:layout_marginLeft="@dimen/spacing_normal"
-            android:layout_marginStart="@dimen/spacing_normal"
+            app:layout_constraintVertical_bias="1.0"
             android:text="@string/text_previous_button"
-            android:textAllCaps="true"
-            app:layout_constraintVertical_bias="1.0" />
+            style="@style/prevNextButtonStyle"/>
         <Button
             android:id="@+id/fragment_recipe_step_detail_next_btn"
             android:layout_width="wrap_content"
@@ -77,11 +69,8 @@
             app:layout_constraintTop_toBottomOf="@id/fragment_recipe_step_detail_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginBottom="@dimen/spacing_normal"
-            android:layout_marginRight="@dimen/spacing_normal"
-            android:layout_marginEnd="@dimen/spacing_normal"
+            app:layout_constraintVertical_bias="1.0"
             android:text="@string/text_next_button"
-            android:textAllCaps="true"
-            app:layout_constraintVertical_bias="1.0" />
+            style="@style/prevNextButtonStyle"/>
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

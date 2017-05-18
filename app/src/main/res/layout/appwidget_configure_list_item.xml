@@ -8,6 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/spacing_normal"
-        android:textSize="@dimen/textsize_big"
+        android:textSize="@dimen/textsize_ingredient_item"
         android:background="?selectableItemBackground"/>
 </FrameLayout>
