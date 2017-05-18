@@ -315,7 +315,7 @@ public class RecipeStepDetailFragment extends RenewableFragment implements View.
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         gestureDetector.onTouchEvent(event);
-        return true;
+        return false;
     }
 
     private class SwipeListener extends GestureDetector.SimpleOnGestureListener {
@@ -324,9 +324,14 @@ public class RecipeStepDetailFragment extends RenewableFragment implements View.
             if (isFullMode) return false;
             float fromX = e1.getX();
             float toX = e2.getX();
-            if ((toX - fromX) <= -swipeThreshold) swipeRight();
-            else if ((toX - fromX) >= swipeThreshold) swipeLeft();
-            return true;
+            if ((toX - fromX) <= -swipeThreshold) {
+                swipeRight();
+                return true;
+            } else if ((toX - fromX) >= swipeThreshold) {
+                swipeLeft();
+                return true;
+            }
+            return false;
         }
     }
 
