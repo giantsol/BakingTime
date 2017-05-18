@@ -4,7 +4,7 @@
 <br>
 This project is built with **Android Studio** and **Gradle**.<br>You can just clone it and run it.
 <br><br>
-## Third party libraries
+**Third party libraries**
 
 - [Butter Knife](http://jakewharton.github.io/butterknife/)
 - [Schematic](https://github.com/SimonVT/schematic)
