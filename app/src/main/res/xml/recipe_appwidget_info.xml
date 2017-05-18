@@ -4,7 +4,7 @@
     android:minHeight="110dp"
     android:updatePeriodMillis="0"
     android:initialLayout="@layout/appwidget"
-    android:configure="com.lee.hansol.bakingtime.RecipeAppWidgetConfigureActivity"
+    android:configure="com.lee.hansol.bakingtime.widget.RecipeAppWidgetConfigureActivity"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen">
 </appwidget-provider>
