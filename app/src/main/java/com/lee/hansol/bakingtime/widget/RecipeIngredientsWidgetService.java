@@ -11,6 +11,7 @@ import com.lee.hansol.bakingtime.models.Ingredient;
 import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.utils.DataUtils;
 import com.lee.hansol.bakingtime.utils.PrefUtils;
+import com.lee.hansol.bakingtime.utils.StringUtils;
 
 import java.util.Locale;
 
@@ -62,11 +63,8 @@ public class RecipeIngredientsWidgetService extends RemoteViewsService {
         }
 
         private RemoteViews getViewsForIngredient(Ingredient ingredient) {
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ingredient_list_item);
-            String text = String.format(Locale.getDefault(),
-                    context.getString(R.string.text_widget_ingredient_placeholder),
-                    ingredient.name, ingredient.quantity, ingredient.measureUnit);
-            views.setTextViewText(R.id.ingredient_list_item_text, text);
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.appwidget_list_item);
+            views.setTextViewText(R.id.appwidget_list_item_text, StringUtils.getIngredientText(context, ingredient));
             return views;
         }
 

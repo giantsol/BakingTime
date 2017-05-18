@@ -23,7 +23,8 @@ public class RecipeAppWidgetProvider extends AppWidgetProvider {
     }
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
-        int recipeId = PrefUtils.getInt(context, appWidgetId, 0);
+        int recipeId = PrefUtils.getInt(context, appWidgetId, -1);
+        if (recipeId == -1) return;
         Recipe recipe = DataUtils.getRecipeObjectWithRecipeId(context, recipeId);
         RemoteViews views = (recipe != null)
                 ? getViewsForRecipe(context, recipe, appWidgetId)

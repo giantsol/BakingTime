@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.helpers.DataStorage;
 import com.lee.hansol.bakingtime.models.Ingredient;
+import com.lee.hansol.bakingtime.utils.StringUtils;
 
 import java.util.Locale;
 
@@ -32,10 +33,7 @@ public class IngredientsRecyclerViewAdapter
     public void onBindViewHolder(IngredientViewHolder holder, int position) {
         Ingredient ingredient = DataStorage.getInstance().getIngredientObjectAt(position);
         if (ingredient != null) {
-            String text = String.format(Locale.getDefault(),
-                    context.getString(R.string.text_ingredient_placeholder),
-                    position + 1, ingredient.name, ingredient.quantity, ingredient.measureUnit);
-            holder.textView.setText(text);
+            holder.textView.setText(StringUtils.getIngredientText(context, ingredient));
         }
     }
 

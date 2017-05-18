@@ -40,6 +40,7 @@ public class RecipeStepDetailFragment extends RenewableFragment {
     private ExoPlayerHelper playerHelper;
     public boolean isFullMode = false;
     public GestureDetectorCompat gestureDetector;
+    private int swipeThreshold;
 
     @BindView(R.id.fragment_recipe_step_detail_short_description) TextView shortDescriptionView;
     @BindView(R.id.fragment_recipe_step_detail_exoplayerview) SimpleExoPlayerView exoPlayerView;
@@ -79,6 +80,7 @@ public class RecipeStepDetailFragment extends RenewableFragment {
     private void initialize() {
         playerHelper = new ExoPlayerHelper(getActivity());
         gestureDetector = new GestureDetectorCompat(getActivity(), new SwipeListener());
+        swipeThreshold = getResources().getInteger(R.integer.swipe_threshold);
         initializeViews();
     }
 
@@ -141,6 +143,7 @@ public class RecipeStepDetailFragment extends RenewableFragment {
             shortDescriptionView.setText(StringUtils.getStepShortDescText(getActivity(), step));
             descriptionView.setText(step.description);
             setupExoPlayerView();
+            setupPrevNextButtonVisibility();
         }
     }
 
@@ -179,6 +182,13 @@ public class RecipeStepDetailFragment extends RenewableFragment {
         exitFullMode();
         SimpleExoPlayer exoPlayer = playerHelper.getInitializedExoPlayer(step);
         exoPlayerView.setPlayer(exoPlayer);
+    }
+
+    private void setupPrevNextButtonVisibility() {
+        if (DataStorage.getInstance().hasNextStep()) nextButton.setVisibility(View.VISIBLE);
+        else nextButton.setVisibility(View.INVISIBLE);
+        if (DataStorage.getInstance().hasPreviousStep()) previousButton.setVisibility(View.VISIBLE);
+        else previousButton.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -305,8 +315,8 @@ public class RecipeStepDetailFragment extends RenewableFragment {
             if (isFullMode) return false;
             float fromX = e1.getX();
             float toX = e2.getX();
-            if ((toX - fromX) <= -500) swipeRight();
-            else if ((toX - fromX) >= 500) swipeLeft();
+            if ((toX - fromX) <= -swipeThreshold) swipeRight();
+            else if ((toX - fromX) >= swipeThreshold) swipeLeft();
             return true;
         }
     }

@@ -31,9 +31,14 @@
         <item name="android:textColor">@color/textColorPrimary</item>
     </style>
     <style name="ingredientItemTextStyle">
-        <item name="android:padding">@dimen/spacing_small</item>
+        <item name="android:layout_margin">@dimen/spacing_small</item>
+        <item name="android:paddingLeft">@dimen/spacing_normal</item>
+        <item name="android:paddingStart">@dimen/spacing_normal</item>
+        <item name="android:paddingRight">@dimen/spacing_small</item>
+        <item name="android:paddingEnd">@dimen/spacing_small</item>
         <item name="android:textSize">@dimen/textsize_ingredient_item</item>
         <item name="android:textColor">@color/textColorSecondary</item>
+        <item name="android:clickable">false</item>
     </style>
     <style name="drawerStyle">
         <item name="android:layout_gravity">start</item>
@@ -73,7 +78,37 @@
     <style name="prevNextButtonStyle">
         <item name="android:layout_margin">@dimen/spacing_normal</item>
         <item name="android:textAllCaps">true</item>
-        <item name="android:background">@color/colorPrimaryLight</item>
+        <item name="android:background">@drawable/prev_next_btn_selector</item>
         <item name="android:textColor">@android:color/white</item>
+    </style>
+    <style name="widgetConfigHeaderTextStyle">
+        <item name="android:gravity">center</item>
+        <item name="android:padding">@dimen/spacing_normal</item>
+        <item name="android:textSize">@dimen/textsize_header</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
+    <style name="widgetConfigItemTextStyle" parent="clickableStyle">
+        <item name="android:padding">@dimen/spacing_normal</item>
+        <item name="android:textSize">@dimen/textsize_subheader</item>
+        <item name="android:gravity">start</item>
+        <item name="android:textColor">@color/textColorSecondary</item>
+    </style>
+    <style name="widgetHeaderTextStyle">
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">@dimen/textsize_widget_header</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:padding">@dimen/spacing_small</item>
+    </style>
+    <style name="widgetIngredientItemTextStyle">
+        <item name="android:layout_margin">@dimen/spacing_small</item>
+        <item name="android:paddingLeft">@dimen/spacing_normal</item>
+        <item name="android:paddingStart">@dimen/spacing_normal</item>
+        <item name="android:paddingRight">@dimen/spacing_small</item>
+        <item name="android:paddingEnd">@dimen/spacing_small</item>
+        <item name="android:textSize">@dimen/textsize_widget_ingredient_item</item>
+        <item name="android:textColor">@color/textColorSecondary</item>
+        <item name="android:clickable">false</item>
     </style>
 </resources>

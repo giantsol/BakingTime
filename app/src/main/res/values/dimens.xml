@@ -13,6 +13,8 @@
     <dimen name="textsize_subheader">20sp</dimen>
     <dimen name="textsize_ingredient_item">12sp</dimen>
     <dimen name="textsize_long_description">14sp</dimen>
+    <dimen name="textsize_widget_header">30sp</dimen>
+    <dimen name="textsize_widget_ingredient_item">16sp</dimen>
 
     <dimen name="sliding_panel_shadow_height">10dp</dimen>
     <dimen name="sliding_panel_height">80dp</dimen>
