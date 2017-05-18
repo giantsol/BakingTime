@@ -3,7 +3,7 @@
     <objectAnimator
         android:duration="50"
         android:propertyName="cardElevation"
-        android:valueTo="4dp"
+        android:valueTo="@dimen/card_max_elevation"
         android:valueType="floatType" />
     <objectAnimator
         android:duration="50"
@@ -13,7 +13,7 @@
     <objectAnimator
         android:duration="50"
         android:propertyName="cardElevation"
-        android:valueTo="1dp"
+        android:valueTo="@dimen/card_elevation"
         android:valueType="floatType"
         android:startOffset="50" />
     <objectAnimator

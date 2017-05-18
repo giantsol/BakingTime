@@ -5,8 +5,8 @@
     android:id="@+id/recipe_list_item_parent"
     android:layout_width="match_parent"
     android:layout_height="@dimen/recipe_card_height"
-    app:cardElevation="1dp"
-    app:cardMaxElevation="4dp"
+    app:cardElevation="@dimen/card_elevation"
+    app:cardMaxElevation="@dimen/card_max_elevation"
     app:cardUseCompatPadding="true">
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
