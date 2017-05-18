@@ -8,7 +8,7 @@
     android:gravity="bottom"
     sothree:umanoOverlay="false"
     sothree:umanoPanelHeight="@dimen/sliding_panel_height"
-    sothree:umanoShadowHeight="@dimen/shadow_height">
+    sothree:umanoShadowHeight="@dimen/sliding_panel_shadow_height">
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -31,9 +31,8 @@
             android:id="@+id/ingredients_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:text="@string/text_ingredients"
-            style="@style/recipeServingsTextStyle" />
+            style="@style/ingredientsHeaderTextStyle" />
         <android.support.v7.widget.RecyclerView
             android:id="@+id/fragment_recipe_step_list_ingredients_view"
             android:layout_width="match_parent"

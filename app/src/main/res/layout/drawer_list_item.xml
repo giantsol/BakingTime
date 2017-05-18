@@ -1,21 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_list_item_parent"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:clickable="true"
-    android:background="?attr/selectableItemBackground">
+    android:layout_height="@dimen/drawer_item_height"
+    style="@style/clickableStyle">
     <ImageView
         android:id="@+id/drawer_list_item_imageview"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:adjustViewBounds="true"/>
+        android:layout_width="@dimen/drawer_item_imageview_width"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:scaleType="centerCrop"/>
     <TextView
         android:id="@+id/drawer_list_item_textview"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="3"/>
-</LinearLayout>
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/drawer_list_item_imageview"
+        app:layout_constraintRight_toRightOf="parent"
+        style="@style/drawerItemTextStyle"/>
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/drawer_list_item_textview"
+        app:layout_constraintRight_toRightOf="parent"
+        style="@style/dividerStyle"/>
+</android.support.constraint.ConstraintLayout>

@@ -1,31 +1,55 @@
 <resources>
 
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/textColorSecondary</item>
     </style>
 
     <style name="recipeHeaderNameTextStyle">
         <item name="android:textSize">@dimen/textsize_header</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
     </style>
     <style name="recipeServingsTextStyle">
         <item name="android:layout_marginTop">@dimen/spacing_small</item>
         <item name="android:textSize">@dimen/textsize_subheader</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColor">@color/textColorSecondary</item>
     </style>
-    <style name="normalTextStyle">
-        <item name="android:textSize">@dimen/textsize_normal</item>
-        <item name="android:textColor">@android:color/black</item>
-    </style>
-    <style name="recipeStepListStepTextStyle">
+    <style name="recipeStepListStepTextStyle" parent="clickableStyle">
         <item name="android:padding">@dimen/spacing_big</item>
+        <item name="android:textSize">@dimen/textsize_subheader</item>
+        <item name="android:gravity">start</item>
+        <item name="android:textColor">@color/textColorSecondary</item>
+    </style>
+    <style name="ingredientsHeaderTextStyle">
         <item name="android:gravity">center</item>
-        <item name="android:textSize">@dimen/textsize_big</item>
-        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:layout_marginTop">@dimen/spacing_small</item>
+        <item name="android:layout_marginBottom">@dimen/spacing_small</item>
+        <item name="android:textSize">@dimen/textsize_subheader</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+    <style name="ingredientItemTextStyle">
+        <item name="android:padding">@dimen/spacing_small</item>
+        <item name="android:textSize">@dimen/textsize_ingredient_item</item>
+        <item name="android:textColor">@color/textColorSecondary</item>
+    </style>
+    <style name="drawerStyle">
+        <item name="android:layout_gravity">start</item>
+        <item name="android:background">@android:color/white</item>
+    </style>
+    <style name="drawerItemTextStyle">
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:paddingLeft">@dimen/spacing_small</item>
+        <item name="android:textSize">@dimen/textsize_subheader</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+    <style name="dividerStyle">
+        <item name="android:background">@color/dividerColor</item>
+    </style>
+    <style name="clickableStyle">
         <item name="android:clickable">true</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 </resources>

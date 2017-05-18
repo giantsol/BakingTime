@@ -11,6 +11,6 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        style="@style/dividerStyle"/>
 </RelativeLayout>

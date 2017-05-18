@@ -8,6 +8,5 @@
         android:id="@+id/ingredient_list_item_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/spacing_small"
-        style="@style/normalTextStyle"/>
+        style="@style/ingredientItemTextStyle"/>
 </RelativeLayout>

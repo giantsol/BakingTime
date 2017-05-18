@@ -59,7 +59,7 @@ public class StepsRecyclerViewAdapter
                 context.getString(R.string.text_step_placeholder),
                 step.stepOrder, step.shortDescription);
         holder.textView.setText(text);
-        holder.itemView.setBackgroundColor(Color.LTGRAY);
+        holder.itemView.setBackgroundResource(R.color.selectedItemColor);
     }
 
     private void setOtherStepView(StepViewHolder holder, @NonNull Step step) {

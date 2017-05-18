@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.helpers.DataStorage;
 import com.lee.hansol.bakingtime.models.Recipe;
+import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,21 +50,32 @@ public class DrawerRecyclerViewAdapter
     }
 
     private void setCurrentRecipeView(ItemViewHolder holder, Recipe recipe) {
-        holder.imageView.setImageResource(R.drawable.ic_assignment_ind_black_24dp);
+        setImageView(holder.imageView, recipe.imageUrlString);
         holder.textView.setText(recipe.name);
-        holder.parent.setBackgroundResource(android.R.color.darker_gray);
+        holder.parent.setBackgroundResource(R.color.selectedItemColor);
         holder.parent.setClickable(false);
     }
 
+    private void setImageView(ImageView imageView, String imageUrlString) {
+        if (imageUrlString.equals(""))
+            Picasso.with(context).load(R.drawable.no_image).into(imageView);
+        else
+            Picasso.with(context).load(imageUrlString).error(R.drawable.no_image).into(imageView);
+    }
+
     private void setOtherRecipeView(ItemViewHolder holder, Recipe recipe) {
-        holder.imageView.setImageResource(R.drawable.ic_assignment_ind_black_24dp);
+        setImageView(holder.imageView, recipe.imageUrlString);
         holder.textView.setText(recipe.name);
+        holder.parent.setBackgroundResource(getNormalBackgroundResource());
+        holder.parent.setClickable(true);
+    }
+
+    private int getNormalBackgroundResource() {
         int[] attrs = new int[]{R.attr.selectableItemBackground};
         TypedArray typedArray = context.obtainStyledAttributes(attrs);
         int backgroundResource = typedArray.getResourceId(0, 0);
-        holder.parent.setBackgroundResource(backgroundResource);
         typedArray.recycle();
-        holder.parent.setClickable(true);
+        return backgroundResource;
     }
 
     @Override
