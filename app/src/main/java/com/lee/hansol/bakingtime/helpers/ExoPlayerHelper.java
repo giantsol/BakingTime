@@ -2,6 +2,7 @@ package com.lee.hansol.bakingtime.helpers;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.google.android.exoplayer2.C;
@@ -28,14 +29,19 @@ import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 public class ExoPlayerHelper implements ExoPlayer.EventListener {
     private final Context context;
     @Nullable private SimpleExoPlayer exoPlayer;
-    private int exoResumeWindow;
-    private long exoResumePosition;
+    public int exoResumeWindow;
+    public long exoResumePosition;
 
     public ExoPlayerHelper(Context context) { this.context = context; }
 
     public void clearExoPlayerResumePosition() {
         exoResumeWindow = C.INDEX_UNSET;
         exoResumePosition = C.TIME_UNSET;
+    }
+
+    public void setExoPlayerResumePosition(int resumeWindow, long resumePosition) {
+        exoResumeWindow = resumeWindow;
+        exoResumePosition = resumePosition;
     }
 
     public void releaseExoPlayer() {
@@ -82,7 +88,7 @@ public class ExoPlayerHelper implements ExoPlayer.EventListener {
         }
     }
 
-    private void updateExoPlayerResumePosition() {
+    public void updateExoPlayerResumePosition() {
         exoResumeWindow = exoPlayer.getCurrentWindowIndex();
         exoResumePosition = exoPlayer.isCurrentWindowSeekable() ? Math.max(0, exoPlayer.getCurrentPosition())
                 : C.TIME_UNSET;

@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -43,6 +44,9 @@ public class RecipeStepDetailFragment extends RenewableFragment implements View.
     public boolean isFullMode = false;
     private GestureDetectorCompat gestureDetector;
     private int swipeThreshold;
+    private final String BUNDLE_KEY_FULLMODE = "fullmode";
+    private final String BUNDLE_KEY_RESUME_WINDOW = "resume_window";
+    private final String BUNDLE_KEY_RESUME_POSITION = "resume_position";
 
     @BindView(R.id.fragment_recipe_step_detail_short_description) TextView shortDescriptionView;
     @BindView(R.id.fragment_recipe_step_detail_exoplayerview) SimpleExoPlayerView exoPlayerView;
@@ -76,22 +80,40 @@ public class RecipeStepDetailFragment extends RenewableFragment implements View.
         View rootView = inflater.inflate(R.layout.fragment_recipe_step_detail, container, false);
         unbinder = ButterKnife.bind(this, rootView);
         rootView.setOnTouchListener(this);
-        initialize();
+        initialize(savedInstanceState);
         return rootView;
     }
 
-    private void initialize() {
+    private void initialize(@Nullable Bundle savedInstanceState) {
         playerHelper = new ExoPlayerHelper(getActivity());
         gestureDetector = new GestureDetectorCompat(getActivity(), new SwipeListener());
         swipeThreshold = getResources().getInteger(R.integer.swipe_threshold);
-        initializeViews();
+        initializeViews(savedInstanceState);
     }
 
-    private void initializeViews() {
-        exitFullMode();
-        playerHelper.clearExoPlayerResumePosition();
-        step = DataStorage.getInstance().getCurrentStepObject();
-        initializeViewContents();
+    private void initializeViews(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            isFullMode = savedInstanceState.getBoolean(BUNDLE_KEY_FULLMODE);
+            int resumeWindow = savedInstanceState.getInt(BUNDLE_KEY_RESUME_WINDOW);
+            long resumePosition = savedInstanceState.getLong(BUNDLE_KEY_RESUME_POSITION);
+            playerHelper.setExoPlayerResumePosition(resumeWindow, resumePosition);
+            step = DataStorage.getInstance().getCurrentStepObject();
+            initializeViewContents();
+            controlFullMoveAccordingToOrientation();
+        } else {
+            exitFullMode();
+            playerHelper.clearExoPlayerResumePosition();
+            step = DataStorage.getInstance().getCurrentStepObject();
+            initializeViewContents();
+        }
+    }
+
+    private void controlFullMoveAccordingToOrientation() {
+        if (exoPlayerView.getVisibility() == View.VISIBLE) {
+            int currentOrientation = getResources().getConfiguration().orientation;
+            if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) enterFullMode();
+            else if (currentOrientation == Configuration.ORIENTATION_PORTRAIT) exitFullMode();
+        }
     }
 
     public void exitFullMode() {
@@ -182,15 +204,14 @@ public class RecipeStepDetailFragment extends RenewableFragment implements View.
     }
 
     private void initializeExoPlayerView() {
-        exitFullMode();
         SimpleExoPlayer exoPlayer = playerHelper.getInitializedExoPlayer(step);
         exoPlayerView.setPlayer(exoPlayer);
     }
 
     private void setupPrevNextButtonVisibility() {
-        if (DataStorage.getInstance().hasNextStep()) nextButton.setVisibility(View.VISIBLE);
+        if (!isFullMode && DataStorage.getInstance().hasNextStep()) nextButton.setVisibility(View.VISIBLE);
         else nextButton.setVisibility(View.INVISIBLE);
-        if (DataStorage.getInstance().hasPreviousStep()) previousButton.setVisibility(View.VISIBLE);
+        if (!isFullMode && DataStorage.getInstance().hasPreviousStep()) previousButton.setVisibility(View.VISIBLE);
         else previousButton.setVisibility(View.INVISIBLE);
     }
 
@@ -207,10 +228,22 @@ public class RecipeStepDetailFragment extends RenewableFragment implements View.
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (exoPlayerView.getVisibility() == View.VISIBLE) {
+            playerHelper.updateExoPlayerResumePosition();
+            outState.putBoolean(BUNDLE_KEY_FULLMODE, isFullMode);
+            outState.putInt(BUNDLE_KEY_RESUME_WINDOW, playerHelper.exoResumeWindow);
+            outState.putLong(BUNDLE_KEY_RESUME_POSITION, playerHelper.exoResumePosition);
+        }
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
-        if (needToReloadExoPlayer())
+        if (needToReloadExoPlayer()) {
+            exitFullMode();
             initializeExoPlayerView();
+        }
     }
 
     private boolean needToReloadExoPlayer() {
@@ -287,29 +320,7 @@ public class RecipeStepDetailFragment extends RenewableFragment implements View.
 
     @Override
     public void renew() {
-        initializeViews();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        if (turnsLandscapeWhilstVideoNotFullMode(newConfig))
-            enterFullMode();
-        else if (turnsPortraitWhilstVideoFullMode(newConfig))
-            exitFullMode();
-    }
-
-    private boolean turnsLandscapeWhilstVideoNotFullMode(Configuration newConfig) {
-        return (playerHelper.getExoPlayer() != null)
-                && (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
-                && !isFullMode;
-    }
-
-    private boolean turnsPortraitWhilstVideoFullMode(Configuration newConfig) {
-        return (playerHelper.getExoPlayer() != null)
-                && (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)
-                && isFullMode;
+        initializeViews(null);
     }
 
     @Override

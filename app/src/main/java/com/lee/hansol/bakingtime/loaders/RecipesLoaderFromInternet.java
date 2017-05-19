@@ -28,6 +28,7 @@ public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
     @NonNull
     public Recipe[] loadInBackground() {
         String urlString = getContext().getString(R.string.url_baking_recipe);
+        log("load in background!");
         try {
             Recipe[] recipes = DataUtils.loadRecipesFromUrl(getContext(), urlString);
             DataUtils.saveRecipesToDb(getContext(), recipes);

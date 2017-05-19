@@ -88,6 +88,7 @@ public class RecipeStepListFragment extends RenewableFragment {
     @Override
     public void onResume() {
         super.onResume();
+        isSliderOpen = slider.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED;
         determineStepListItemClickable();
         scrollToWhereItShouldBe();
     }
