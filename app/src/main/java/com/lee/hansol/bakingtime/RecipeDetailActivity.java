@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 
 import com.lee.hansol.bakingtime.adapters.DrawerRecyclerViewAdapter;
@@ -28,8 +27,6 @@ import com.lee.hansol.bakingtime.utils.User;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 public class RecipeDetailActivity extends AppCompatActivity
         implements StepsRecyclerViewAdapter.OnStepItemClickListener,
@@ -146,7 +143,6 @@ public class RecipeDetailActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         setDrawerAvailability();
-        log("stepdetailvisible: " + isStepDetailFragmentVisible);
     }
 
     private void setDrawerAvailability() {

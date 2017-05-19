@@ -19,8 +19,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-import static com.lee.hansol.bakingtime.utils.LogUtils.log;
-
 public class RecipeStepListFragment extends RenewableFragment {
     private Unbinder unbinder;
     private StepsRecyclerViewAdapter.OnStepItemClickListener stepItemClickListener;

@@ -8,10 +8,7 @@ import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.models.Recipe;
 import com.lee.hansol.bakingtime.utils.DataUtils;
 
-import java.util.Locale;
-
 import static com.lee.hansol.bakingtime.utils.DataUtils.emptyRecipes;
-import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
     private Recipe[] recipes;
@@ -28,7 +25,6 @@ public class RecipesLoaderFromInternet extends AsyncTaskLoader<Recipe[]> {
     @NonNull
     public Recipe[] loadInBackground() {
         String urlString = getContext().getString(R.string.url_baking_recipe);
-        log("load in background!");
         try {
             Recipe[] recipes = DataUtils.loadRecipesFromUrl(getContext(), urlString);
             DataUtils.saveRecipesToDb(getContext(), recipes);

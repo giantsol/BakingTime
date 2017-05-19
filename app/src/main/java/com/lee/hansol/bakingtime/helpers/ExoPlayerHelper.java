@@ -2,7 +2,6 @@ package com.lee.hansol.bakingtime.helpers;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.google.android.exoplayer2.C;
@@ -23,8 +22,6 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.lee.hansol.bakingtime.R;
 import com.lee.hansol.bakingtime.models.Step;
-
-import static com.lee.hansol.bakingtime.utils.LogUtils.log;
 
 public class ExoPlayerHelper implements ExoPlayer.EventListener {
     private final Context context;
@@ -49,7 +46,6 @@ public class ExoPlayerHelper implements ExoPlayer.EventListener {
             pauseExoPlayer();
             exoPlayer.stop();
             exoPlayer.release();
-            log(context.getString(R.string.log_release_exoplayer));
         }
         exoPlayer = null;
     }

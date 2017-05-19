@@ -5,7 +5,6 @@ import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -34,8 +33,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-import static com.lee.hansol.bakingtime.utils.LogUtils.log;
-
 public class RecipeStepDetailFragment extends RenewableFragment implements View.OnTouchListener {
     private Unbinder unbinder;
     private Step step;
@@ -44,7 +41,6 @@ public class RecipeStepDetailFragment extends RenewableFragment implements View.
     public boolean isFullMode = false;
     private GestureDetectorCompat gestureDetector;
     private int swipeThreshold;
-    private final String BUNDLE_KEY_FULLMODE = "fullmode";
     private final String BUNDLE_KEY_RESUME_WINDOW = "resume_window";
     private final String BUNDLE_KEY_RESUME_POSITION = "resume_position";
 
@@ -93,13 +89,12 @@ public class RecipeStepDetailFragment extends RenewableFragment implements View.
 
     private void initializeViews(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            isFullMode = savedInstanceState.getBoolean(BUNDLE_KEY_FULLMODE);
             int resumeWindow = savedInstanceState.getInt(BUNDLE_KEY_RESUME_WINDOW);
             long resumePosition = savedInstanceState.getLong(BUNDLE_KEY_RESUME_POSITION);
             playerHelper.setExoPlayerResumePosition(resumeWindow, resumePosition);
             step = DataStorage.getInstance().getCurrentStepObject();
             initializeViewContents();
-            controlFullMoveAccordingToOrientation();
+            controlFullModeAccordingToOrientation();
         } else {
             exitFullMode();
             playerHelper.clearExoPlayerResumePosition();
@@ -108,7 +103,7 @@ public class RecipeStepDetailFragment extends RenewableFragment implements View.
         }
     }
 
-    private void controlFullMoveAccordingToOrientation() {
+    private void controlFullModeAccordingToOrientation() {
         if (exoPlayerView.getVisibility() == View.VISIBLE) {
             int currentOrientation = getResources().getConfiguration().orientation;
             if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) enterFullMode();
@@ -231,7 +226,6 @@ public class RecipeStepDetailFragment extends RenewableFragment implements View.
     public void onSaveInstanceState(Bundle outState) {
         if (exoPlayerView.getVisibility() == View.VISIBLE) {
             playerHelper.updateExoPlayerResumePosition();
-            outState.putBoolean(BUNDLE_KEY_FULLMODE, isFullMode);
             outState.putInt(BUNDLE_KEY_RESUME_WINDOW, playerHelper.exoResumeWindow);
             outState.putLong(BUNDLE_KEY_RESUME_POSITION, playerHelper.exoResumePosition);
         }
